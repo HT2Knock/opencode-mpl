@@ -83,14 +83,19 @@ always carries the saved path, so it works without the preview too.
 
 ## Theme
 
-A `./tui` part reads the active OpenCode theme and sends its palette to the
-server over RPC. The renderer maps `background.base`, `text.base`, `text.muted`,
-`border.base`, and the `categorical` hues (step 400 on dark, 600 on light) into
-an mpl style. `C0`..`C7` follow the theme.
+A `./tui` part reads the active OpenCode theme and writes
+`~/.local/share/opencode/mpl/palette.json`. The renderer reads that file and
+maps `background.base`, `text.base`, `text.muted`, `border.base`, and the
+`categorical` hues (step 400 on dark, 600 on light) into an mpl style.
+`C0`..`C7` follow the theme.
 
-When no palette has arrived, for example in `opencode run`, the plugin reads
-`theme.mode` from `~/.config/opencode/cli.json` and uses `pro-slate` for light
-and `pro-dark` for dark. `system` counts as dark.
+The file bridge does not depend on the TUI lifetime, so `opencode run` gets the
+palette too after the TUI has started once with this plugin. A theme change
+reaches the chart after the next TUI start.
+
+When no palette file exists, the plugin reads `theme.mode` from
+`~/.config/opencode/cli.json` and uses `pro-slate` for light and `pro-dark` for
+dark. `system` counts as dark.
 
 A `theme` in the tool input selects a bundled mpl style (`pro-dark`,
 `pro-slate`, any matplotlib style) and overrides the palette.
@@ -99,12 +104,11 @@ A `theme` in the tool input selects a bundled mpl style (`pro-dark`,
 
 | Path               | Purpose                                               |
 | ------------------ | ----------------------------------------------------- |
-| `src/index.ts`     | Plugin part: tool, skill, palette RPC                 |
+| `src/index.ts`     | Plugin part: tool and skill                           |
 | `src/render.ts`    | Spec to PNG/SVG files                                 |
 | `src/replay.ts`    | Spec replay with the Axes/Figure allow-list           |
 | `src/palette.ts`   | Theme tokens to `.mplstyle`, fallback from `cli.json` |
-| `src/rpc.ts`       | Palette bridge contract                               |
-| `src/tui.ts`       | TUI part: pushes the theme palette                    |
+| `src/tui.ts`       | TUI part: writes the theme palette                    |
 | `src/skill.ts`     | `mpl-charts` skill text                               |
 | `scripts/build.ts` | esbuild bundle into `dist/`                           |
 | `test/`            | bun tests                                             |

@@ -1,11 +1,10 @@
-/** OpenCode Plugin part: registers the mpl tool, the skill, and the palette RPC. */
+/** OpenCode Plugin part: registers the mpl tool and the mpl-charts skill. */
 import { homedir } from "node:os";
 import { basename, isAbsolute, join } from "node:path";
 import { Plugin, Skill, Tool } from "@opencode/plugin/effect";
 import { Effect, Schema } from "effect";
-import { PALETTE_STORAGE_KEY, isPalette } from "./palette.js";
+import { readPalette } from "./palette.js";
 import { defaultChartDir, renderChart, type MplRenderInput } from "./render.js";
-import { PaletteRpc } from "./rpc.js";
 import { SKILL_CONTENT, SKILL_DESCRIPTION, SKILL_ID, SKILL_NAME } from "./skill.js";
 
 const NAMESPACE = "mpl";
@@ -82,8 +81,7 @@ export default Plugin.define({
           options: { namespace: NAMESPACE },
           execute: (input) =>
             Effect.gen(function* () {
-              const stored = yield* ctx.storage.get(PALETTE_STORAGE_KEY);
-              const palette = isPalette(stored) ? stored : undefined;
+              const palette = readPalette();
               const render = attempt(() =>
                 renderChart(input as MplRenderInput, { outDir: chartDir(ctx.options, directory), palette }),
               );
@@ -128,14 +126,6 @@ export default Plugin.define({
           path: Skill.Info.fields.path.make(skillPath()),
           content: SKILL_CONTENT,
         });
-      }).pipe(Effect.orDie);
-
-      yield* ctx.rpc.register(PaletteRpc, {
-        setTheme: (input) =>
-          Effect.gen(function* () {
-            yield* ctx.storage.set(PALETTE_STORAGE_KEY, input as never);
-            return {};
-          }),
       }).pipe(Effect.orDie);
 
       yield* Effect.logDebug(`mpl: ready (charts in ${chartDir(ctx.options, directory)})`);

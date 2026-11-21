@@ -5,10 +5,9 @@ import { Plugin, Skill, Tool } from "@opencode/plugin/effect";
 import { Effect, Schema } from "effect";
 
 // src/palette.ts
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
-var PALETTE_STORAGE_KEY = "palette";
+import { dirname, join } from "node:path";
 function bareHex(value, name) {
   const hex3 = value.startsWith("#") ? value.slice(1) : value;
   if (!/^[0-9a-f]{6}$/i.test(hex3)) throw new Error(`palette ${name} must be a hex colour, got ${JSON.stringify(value)}`);
@@ -66,6 +65,18 @@ function styleFromPalette(palette) {
     "xtick.major.pad: 5"
   ].join("\n");
 }
+function palettePath(env = process.env) {
+  const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
+  return join(dataHome, "opencode", "mpl", "palette.json");
+}
+function readPalette(env = process.env) {
+  try {
+    const parsed = JSON.parse(readFileSync(palettePath(env), "utf8"));
+    return isPalette(parsed) ? parsed : void 0;
+  } catch {
+    return void 0;
+  }
+}
 function cliSettingsPath(env = process.env) {
   const configHome = env.XDG_CONFIG_HOME || join(homedir(), ".config");
   return join(configHome, "opencode", "cli.json");
@@ -81,7 +92,7 @@ function fallbackStyle(env = process.env) {
 }
 
 // src/render.ts
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync as mkdirSync2, writeFileSync as writeFileSync2 } from "node:fs";
 import { homedir as homedir2 } from "node:os";
 import { join as join2 } from "node:path";
 
@@ -16154,45 +16165,21 @@ function renderChart(input, options = {}) {
   const now2 = /* @__PURE__ */ new Date();
   const stem = fileStem(input.name, now2);
   const outDir = options.outDir ?? defaultChartDir(now2);
-  mkdirSync(outDir, { recursive: true });
+  mkdirSync2(outDir, { recursive: true });
   let png;
   let pngPath;
   let svgPath;
   if (format2 !== "svg") {
     png = fig.toPNGSync({ scale });
     pngPath = join2(outDir, `${stem}.png`);
-    writeFileSync(pngPath, png);
+    writeFileSync2(pngPath, png);
   }
   if (format2 !== "png") {
     svgPath = join2(outDir, `${stem}.svg`);
-    writeFileSync(svgPath, fig.toSVG());
+    writeFileSync2(svgPath, fig.toSVG());
   }
   return { png, pngPath, svgPath, theme, ...png ? pngSize(png) : {} };
 }
-
-// src/rpc.ts
-import { Rpc } from "@opencode/plugin/rpc";
-var SET_THEME_INPUT = {
-  type: "object",
-  properties: {
-    mode: { type: "string", enum: ["dark", "light"] },
-    background: { type: "string" },
-    text: { type: "string" },
-    muted: { type: "string" },
-    border: { type: "string" },
-    categorical: { type: "array", items: { type: "string" }, minItems: 1 }
-  },
-  required: ["mode", "background", "text", "muted", "border", "categorical"],
-  additionalProperties: false
-};
-var EMPTY_OUTPUT = { type: "object", properties: {}, additionalProperties: false };
-var PaletteRpc = Rpc.define({
-  id: "mpl-palette",
-  methods: {
-    setTheme: { input: SET_THEME_INPUT, output: EMPTY_OUTPUT }
-  },
-  events: {}
-});
 
 // src/skill.ts
 var SKILL_ID = "mpl-charts";
@@ -16330,8 +16317,7 @@ var index_default = Plugin.define({
         output: RenderOutput,
         options: { namespace: NAMESPACE },
         execute: (input) => Effect.gen(function* () {
-          const stored = yield* ctx.storage.get(PALETTE_STORAGE_KEY);
-          const palette = isPalette(stored) ? stored : void 0;
+          const palette = readPalette();
           const render = attempt(
             () => renderChart(input, { outDir: chartDir(ctx.options, directory), palette })
           );
@@ -16373,12 +16359,6 @@ var index_default = Plugin.define({
         path: Skill.Info.fields.path.make(skillPath()),
         content: SKILL_CONTENT
       });
-    }).pipe(Effect.orDie);
-    yield* ctx.rpc.register(PaletteRpc, {
-      setTheme: (input) => Effect.gen(function* () {
-        yield* ctx.storage.set(PALETTE_STORAGE_KEY, input);
-        return {};
-      })
     }).pipe(Effect.orDie);
     yield* Effect.logDebug(`mpl: ready (charts in ${chartDir(ctx.options, directory)})`);
   })

@@ -1,29 +1,22 @@
 // src/tui.ts
 import { Plugin } from "@opencode/plugin/tui";
 
-// src/rpc.ts
-import { Rpc } from "@opencode/plugin/rpc";
-var SET_THEME_INPUT = {
-  type: "object",
-  properties: {
-    mode: { type: "string", enum: ["dark", "light"] },
-    background: { type: "string" },
-    text: { type: "string" },
-    muted: { type: "string" },
-    border: { type: "string" },
-    categorical: { type: "array", items: { type: "string" }, minItems: 1 }
-  },
-  required: ["mode", "background", "text", "muted", "border", "categorical"],
-  additionalProperties: false
-};
-var EMPTY_OUTPUT = { type: "object", properties: {}, additionalProperties: false };
-var PaletteRpc = Rpc.define({
-  id: "mpl-palette",
-  methods: {
-    setTheme: { input: SET_THEME_INPUT, output: EMPTY_OUTPUT }
-  },
-  events: {}
-});
+// src/palette.ts
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { dirname, join } from "node:path";
+function palettePath(env = process.env) {
+  const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
+  return join(dataHome, "opencode", "mpl", "palette.json");
+}
+function writePalette(palette, env = process.env) {
+  const path = palettePath(env);
+  mkdirSync(dirname(path), { recursive: true });
+  const temporary = `${path}.${process.pid}.tmp`;
+  writeFileSync(temporary, JSON.stringify(palette));
+  renameSync(temporary, path);
+  return path;
+}
 
 // src/tui.ts
 function hex(color) {
@@ -35,18 +28,18 @@ var tui_default = Plugin.define({
   async setup(context) {
     const theme = context.theme;
     const step = context.themeMode === "dark" ? 400 : 600;
-    const categorical = theme.categorical.map((scale) => hex(scale[step]));
+    const palette = {
+      mode: context.themeMode,
+      background: hex(theme.background.base),
+      text: hex(theme.text.base),
+      muted: hex(theme.text.muted),
+      border: hex(theme.border.base),
+      categorical: theme.categorical.map((scale) => hex(scale[step]))
+    };
     try {
-      await context.client.rpc(PaletteRpc).setTheme({
-        mode: context.themeMode,
-        background: hex(theme.background.base),
-        text: hex(theme.text.base),
-        muted: hex(theme.text.muted),
-        border: hex(theme.border.base),
-        categorical
-      });
+      writePalette(palette);
     } catch (error) {
-      console.warn(`mpl: palette not sent: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(`mpl: palette not written: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 });

@@ -1,9 +1,9 @@
 /** OpenCode theme palette to an mpl style. All colours are opaque and theme-derived. */
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
-/** The palette the TUI part pushes through the palette RPC. */
+/** The palette the TUI part writes for the server renderer. */
 export interface Palette {
   readonly mode: "dark" | "light";
   readonly background: string;
@@ -13,7 +13,6 @@ export interface Palette {
   readonly categorical: readonly string[];
 }
 
-export const PALETTE_STORAGE_KEY = "palette";
 
 /** Hue step used for series colours: bright on dark backgrounds, deeper on light ones. */
 export function seriesStep(mode: Palette["mode"]): number {
@@ -91,6 +90,31 @@ export function styleFromPalette(palette: Palette): string {
     "xtick.major.width: 0.8",
     "xtick.major.pad: 5",
   ].join("\n");
+}
+
+/** Shared palette file: the TUI part writes it, the server renderer reads it. */
+export function palettePath(env: NodeJS.ProcessEnv = process.env): string {
+  const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
+  return join(dataHome, "opencode", "mpl", "palette.json");
+}
+
+export function readPalette(env: NodeJS.ProcessEnv = process.env): Palette | undefined {
+  try {
+    const parsed: unknown = JSON.parse(readFileSync(palettePath(env), "utf8"));
+    return isPalette(parsed) ? parsed : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Writes through a temporary file, so a reader never sees a half-written palette. */
+export function writePalette(palette: Palette, env: NodeJS.ProcessEnv = process.env): string {
+  const path = palettePath(env);
+  mkdirSync(dirname(path), { recursive: true });
+  const temporary = `${path}.${process.pid}.tmp`;
+  writeFileSync(temporary, JSON.stringify(palette));
+  renameSync(temporary, path);
+  return path;
 }
 
 /** CLI settings path: the theme selection lives here, not in opencode.json. */

@@ -1,6 +1,6 @@
-/** TUI part: pushes the active OpenCode theme to the server once, at plugin load. */
+/** TUI part: writes the active OpenCode theme for the server renderer, once per TUI load. */
 import { Plugin } from "@opencode/plugin/tui";
-import { PaletteRpc } from "./rpc.js";
+import { writePalette } from "./palette.js";
 
 interface Rgba {
   toInts(): [number, number, number, number];
@@ -16,19 +16,19 @@ export default Plugin.define({
   async setup(context) {
     const theme = context.theme;
     const step = context.themeMode === "dark" ? 400 : 600;
-    const categorical = theme.categorical.map((scale: Record<number, Rgba>) => hex(scale[step] as Rgba));
+    const palette = {
+      mode: context.themeMode,
+      background: hex(theme.background.base),
+      text: hex(theme.text.base),
+      muted: hex(theme.text.muted),
+      border: hex(theme.border.base),
+      categorical: theme.categorical.map((scale: Record<number, Rgba>) => hex(scale[step] as Rgba)),
+    };
 
     try {
-      await context.client.rpc(PaletteRpc).setTheme({
-        mode: context.themeMode,
-        background: hex(theme.background.base),
-        text: hex(theme.text.base),
-        muted: hex(theme.text.muted),
-        border: hex(theme.border.base),
-        categorical,
-      });
+      writePalette(palette);
     } catch (error) {
-      console.warn(`mpl: palette not sent: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(`mpl: palette not written: ${error instanceof Error ? error.message : String(error)}`);
     }
   },
 });
