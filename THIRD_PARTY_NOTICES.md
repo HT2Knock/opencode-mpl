@@ -1,6 +1,34 @@
 # Third-party notices
 
-mpl is licensed under the ISC license (see `LICENSE`). It incorporates or is derived from the
+This plugin bundles mpl and its data files. The sections below reproduce the
+licenses of the bundled works, starting with mpl itself. Everything after the
+mpl section is copied from mpl's own `THIRD_PARTY_NOTICES.md`.
+
+## mpl
+
+Source: https://github.com/ivarvong/mpl
+
+```text
+ISC License
+
+Copyright (c) 2026 Ivar Vong
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+---
+
+mpl is licensed under the ISC license (reproduced below). It incorporates or is derived from the
 third-party works below. The license texts that follow are reproduced verbatim from the upstream
 sources named in each section.
 

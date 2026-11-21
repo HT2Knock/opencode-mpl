@@ -1,6 +1,6 @@
 // src/index.ts
 import { homedir as homedir3 } from "node:os";
-import { basename, isAbsolute, join as join3 } from "node:path";
+import { isAbsolute, join as join3 } from "node:path";
 import { Plugin, Skill, Tool } from "@opencode/plugin/effect";
 import { Effect, Schema } from "effect";
 
@@ -10,7 +10,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 function bareHex(value, name) {
   const hex3 = value.startsWith("#") ? value.slice(1) : value;
-  if (!/^[0-9a-f]{6}$/i.test(hex3)) throw new Error(`palette ${name} must be a hex colour, got ${JSON.stringify(value)}`);
+  if (!/^[0-9a-f]{6}$/i.test(hex3)) throw new Error(`palette ${name} must be a hex color, got ${JSON.stringify(value)}`);
   return hex3.toLowerCase();
 }
 function isPalette(value) {
@@ -94,7 +94,7 @@ function fallbackStyle(env = process.env) {
 // src/render.ts
 import { mkdirSync as mkdirSync2, writeFileSync as writeFileSync2 } from "node:fs";
 import { homedir as homedir2 } from "node:os";
-import { join as join2 } from "node:path";
+import { basename, join as join2 } from "node:path";
 
 // node_modules/mpl/dist/browser/core/data/colors.js
 var NAMED = /* @__PURE__ */ new Map([["aliceblue", "#f0f8ff"], ["antiquewhite", "#faebd7"], ["aqua", "#00ffff"], ["aquamarine", "#7fffd4"], ["azure", "#f0ffff"], ["b", "#0000ff"], ["beige", "#f5f5dc"], ["bisque", "#ffe4c4"], ["black", "#000000"], ["blanchedalmond", "#ffebcd"], ["blue", "#0000ff"], ["blueviolet", "#8a2be2"], ["brown", "#a52a2a"], ["burlywood", "#deb887"], ["c", "#00bfbf"], ["cadetblue", "#5f9ea0"], ["chartreuse", "#7fff00"], ["chocolate", "#d2691e"], ["coral", "#ff7f50"], ["cornflowerblue", "#6495ed"], ["cornsilk", "#fff8dc"], ["crimson", "#dc143c"], ["cyan", "#00ffff"], ["darkblue", "#00008b"], ["darkcyan", "#008b8b"], ["darkgoldenrod", "#b8860b"], ["darkgray", "#a9a9a9"], ["darkgreen", "#006400"], ["darkgrey", "#a9a9a9"], ["darkkhaki", "#bdb76b"], ["darkmagenta", "#8b008b"], ["darkolivegreen", "#556b2f"], ["darkorange", "#ff8c00"], ["darkorchid", "#9932cc"], ["darkred", "#8b0000"], ["darksalmon", "#e9967a"], ["darkseagreen", "#8fbc8f"], ["darkslateblue", "#483d8b"], ["darkslategray", "#2f4f4f"], ["darkslategrey", "#2f4f4f"], ["darkturquoise", "#00ced1"], ["darkviolet", "#9400d3"], ["deeppink", "#ff1493"], ["deepskyblue", "#00bfff"], ["dimgray", "#696969"], ["dimgrey", "#696969"], ["dodgerblue", "#1e90ff"], ["firebrick", "#b22222"], ["floralwhite", "#fffaf0"], ["forestgreen", "#228b22"], ["fuchsia", "#ff00ff"], ["g", "#008000"], ["gainsboro", "#dcdcdc"], ["ghostwhite", "#f8f8ff"], ["gold", "#ffd700"], ["goldenrod", "#daa520"], ["gray", "#808080"], ["green", "#008000"], ["greenyellow", "#adff2f"], ["grey", "#808080"], ["honeydew", "#f0fff0"], ["hotpink", "#ff69b4"], ["indianred", "#cd5c5c"], ["indigo", "#4b0082"], ["ivory", "#fffff0"], ["k", "#000000"], ["khaki", "#f0e68c"], ["lavender", "#e6e6fa"], ["lavenderblush", "#fff0f5"], ["lawngreen", "#7cfc00"], ["lemonchiffon", "#fffacd"], ["lightblue", "#add8e6"], ["lightcoral", "#f08080"], ["lightcyan", "#e0ffff"], ["lightgoldenrodyellow", "#fafad2"], ["lightgray", "#d3d3d3"], ["lightgreen", "#90ee90"], ["lightgrey", "#d3d3d3"], ["lightpink", "#ffb6c1"], ["lightsalmon", "#ffa07a"], ["lightseagreen", "#20b2aa"], ["lightskyblue", "#87cefa"], ["lightslategray", "#778899"], ["lightslategrey", "#778899"], ["lightsteelblue", "#b0c4de"], ["lightyellow", "#ffffe0"], ["lime", "#00ff00"], ["limegreen", "#32cd32"], ["linen", "#faf0e6"], ["m", "#bf00bf"], ["magenta", "#ff00ff"], ["maroon", "#800000"], ["mediumaquamarine", "#66cdaa"], ["mediumblue", "#0000cd"], ["mediumorchid", "#ba55d3"], ["mediumpurple", "#9370db"], ["mediumseagreen", "#3cb371"], ["mediumslateblue", "#7b68ee"], ["mediumspringgreen", "#00fa9a"], ["mediumturquoise", "#48d1cc"], ["mediumvioletred", "#c71585"], ["midnightblue", "#191970"], ["mintcream", "#f5fffa"], ["mistyrose", "#ffe4e1"], ["moccasin", "#ffe4b5"], ["navajowhite", "#ffdead"], ["navy", "#000080"], ["oldlace", "#fdf5e6"], ["olive", "#808000"], ["olivedrab", "#6b8e23"], ["orange", "#ffa500"], ["orangered", "#ff4500"], ["orchid", "#da70d6"], ["palegoldenrod", "#eee8aa"], ["palegreen", "#98fb98"], ["paleturquoise", "#afeeee"], ["palevioletred", "#db7093"], ["papayawhip", "#ffefd5"], ["peachpuff", "#ffdab9"], ["peru", "#cd853f"], ["pink", "#ffc0cb"], ["plum", "#dda0dd"], ["powderblue", "#b0e0e6"], ["purple", "#800080"], ["r", "#ff0000"], ["rebeccapurple", "#663399"], ["red", "#ff0000"], ["rosybrown", "#bc8f8f"], ["royalblue", "#4169e1"], ["saddlebrown", "#8b4513"], ["salmon", "#fa8072"], ["sandybrown", "#f4a460"], ["seagreen", "#2e8b57"], ["seashell", "#fff5ee"], ["sienna", "#a0522d"], ["silver", "#c0c0c0"], ["skyblue", "#87ceeb"], ["slateblue", "#6a5acd"], ["slategray", "#708090"], ["slategrey", "#708090"], ["snow", "#fffafa"], ["springgreen", "#00ff7f"], ["steelblue", "#4682b4"], ["tab:blue", "#1f77b4"], ["tab:brown", "#8c564b"], ["tab:cyan", "#17becf"], ["tab:gray", "#7f7f7f"], ["tab:green", "#2ca02c"], ["tab:olive", "#bcbd22"], ["tab:orange", "#ff7f0e"], ["tab:pink", "#e377c2"], ["tab:purple", "#9467bd"], ["tab:red", "#d62728"], ["tan", "#d2b48c"], ["teal", "#008080"], ["thistle", "#d8bfd8"], ["tomato", "#ff6347"], ["turquoise", "#40e0d0"], ["violet", "#ee82ee"], ["w", "#ffffff"], ["wheat", "#f5deb3"], ["white", "#ffffff"], ["whitesmoke", "#f5f5f5"], ["y", "#bfbf00"], ["yellow", "#ffff00"], ["yellowgreen", "#9acd32"]]);
@@ -16069,11 +16069,11 @@ function buildFigure(spec) {
         `calls[${index}] ${fn}: expected [method, [positional args], {kwargs}]; wrap all positional args in one array, e.g. ["bar", [["a", "b"], [3, 7]], { color: "C1" }]`
       );
     }
-    const args = args0.map(decodeValue);
     try {
+      const args = args0.map(decodeValue);
       if (fn === "sca") {
         const i = args[0];
-        if (typeof i !== "number" || !axes[i]) throw new MplSpecError(`sca: no Axes ${String(i)} (have ${axes.length})`);
+        if (typeof i !== "number" || !axes[i]) throw new MplSpecError(`no Axes ${String(i)} (have ${axes.length})`);
         ax = axes[i];
         return;
       }
@@ -16091,7 +16091,7 @@ function buildFigure(spec) {
       if (fn === "$date_x") {
         const [name, lkw, fmt] = args0;
         const Loc = DATE_LOCATORS[name];
-        if (!Loc) throw new MplSpecError(`$date_x: unknown locator ${name}; use one of ${Object.keys(DATE_LOCATORS).join(", ")}`);
+        if (!Loc) throw new MplSpecError(`unknown locator ${name}; use one of ${Object.keys(DATE_LOCATORS).join(", ")}`);
         const loc = new Loc(lkw ?? {});
         ax.xaxis.set_major_locator(loc);
         if (fmt === "concise") ax.xaxis.set_major_formatter(new ConciseDateFormatter(loc, {}));
@@ -16104,8 +16104,8 @@ function buildFigure(spec) {
         const kw = decodeKwargs(kwargs, ax);
         if (name === "colorbar") {
           const mappable = [...ax.artists].reverse().find((a) => a.kind === "image" || a.kind === "scatter" && a.mappable.kind === "some");
-          if (!mappable) throw new MplSpecError("fig.colorbar: no imshow or colour-mapped scatter on the current Axes");
-          fig.colorbar?.(mappable, ...Object.keys(kw).length ? [kw] : []);
+          if (!mappable) throw new MplSpecError("no imshow or color-mapped scatter on the current Axes");
+          fig.colorbar?.(...withKwargs([mappable], kw));
           return;
         }
         fig[name]?.(...withKwargs(args, kw));
@@ -16128,9 +16128,6 @@ registerColormaps(...allColormaps);
 registerColormapRgba(...allColormapRgba);
 var MPL_DEFAULT_SCALE = 2;
 var MPL_THEMES = [...availableStyles().filter((s) => s !== "default"), "default"];
-function defaultThemeName(env = process.env) {
-  return fallbackStyle(env);
-}
 function themeStyle(theme) {
   if (theme === "default") return [];
   if (!MPL_THEMES.includes(theme)) throw new Error(`unknown theme "${theme}"; use one of ${MPL_THEMES.join(", ")}`);
@@ -16144,6 +16141,23 @@ function fileStem(name, now2) {
   const slug = (name ?? "chart").toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "chart";
   return `${slug}-${now2.toISOString().slice(11, 19).replaceAll(":", "")}`;
 }
+function toToolReply(result) {
+  const paths = [result.pngPath, result.svgPath].filter((path) => typeof path === "string");
+  const text = [
+    `theme: ${result.theme}`,
+    ...result.width !== void 0 && result.height !== void 0 ? [`size: ${result.width}x${result.height}`] : [],
+    ...paths
+  ].join("\n");
+  if (!result.png || !result.pngPath) return { text };
+  return {
+    text,
+    image: {
+      uri: `data:image/png;base64,${Buffer.from(result.png).toString("base64")}`,
+      mime: "image/png",
+      name: basename(result.pngPath)
+    }
+  };
+}
 function pngSize(png) {
   const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
   return { width: view.getUint32(16), height: view.getUint32(20) };
@@ -16151,7 +16165,7 @@ function pngSize(png) {
 function resolveStyle(input, options) {
   if (input.theme !== void 0) return { style: themeStyle(input.theme), theme: input.theme };
   if (options.palette) return { style: styleFromPalette(options.palette), theme: `opencode-${options.palette.mode}` };
-  const fallback = defaultThemeName();
+  const fallback = fallbackStyle();
   return { style: themeStyle(fallback), theme: fallback };
 }
 function renderChart(input, options = {}) {
@@ -16204,7 +16218,7 @@ replays matplotlib calls in order, writes PNG and/or SVG, and returns the image 
   makes it current.
 - Figure calls take a \`fig.\` prefix: \`fig.text\`, \`fig.suptitle\`, \`fig.supxlabel\`,
   \`fig.supylabel\`, \`fig.subplots_adjust\`, \`fig.autofmt_xdate\`, \`fig.tight_layout\`,
-  \`fig.colorbar\`. \`fig.colorbar\` maps the last imshow or colour-mapped scatter on the current Axes.
+  \`fig.colorbar\`. \`fig.colorbar\` maps the last imshow or color-mapped scatter on the current Axes.
 - Values: \`{ "$float": "nan" }\` is NaN. \`{ "$transform": "axes" }\` is \`ax.transAxes\`.
 - \`theme\`: a bundled style name, such as \`pro-dark\`, \`pro-slate\` or any matplotlib style.
   Leave it out to use the active OpenCode theme.
@@ -16233,10 +16247,10 @@ image line (\`![name](path)\`) when the user should see it in the transcript.
   \`["$date_x", ["MonthLocator", { interval: 1 }, "%b %d" | "concise"]]\`.
 - \`annotate\` takes epoch days (ms / 86400000) as coordinates.
 
-## Colours
+## Colors
 
-Series colours follow the active theme: \`C0\`..\`C7\` are the theme's categorical colours, in order.
-Name a colour only when it carries meaning (red for a failure, green for a pass). Do not hard-code
+Series colors follow the active theme: \`C0\`..\`C7\` are the theme's categorical colors, in order.
+Name a color only when it carries meaning (red for a failure, green for a pass). Do not hard-code
 a palette.
 
 ## Chart types
@@ -16323,20 +16337,10 @@ var index_default = Plugin.define({
           );
           if (!render.ok) return yield* Effect.fail(new Tool.Error({ message: render.message }));
           const result = render.value;
-          const paths = [result.pngPath, result.svgPath].filter((path) => typeof path === "string");
-          const details = [
-            `theme: ${result.theme}`,
-            ...result.width !== void 0 && result.height !== void 0 ? [`size: ${result.width}x${result.height}`] : [],
-            ...paths
-          ];
-          const content = [{ type: "text", text: details.join("\n") }];
-          if (result.png && result.pngPath) {
-            content.push({
-              type: "file",
-              uri: `data:image/png;base64,${Buffer.from(result.png).toString("base64")}`,
-              mime: "image/png",
-              name: basename(result.pngPath)
-            });
+          const reply = toToolReply(result);
+          const content = [{ type: "text", text: reply.text }];
+          if (reply.image) {
+            content.push({ type: "file", ...reply.image });
           }
           return {
             output: {

@@ -2,7 +2,7 @@ import { afterAll, expect, test } from "bun:test";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { MPL_THEMES, renderChart } from "../src/render";
+import { MPL_THEMES, renderChart, toToolReply } from "../src/render";
 import type { Palette } from "../src/palette";
 
 const outDir = mkdtempSync(join(tmpdir(), "opencode-mpl-test-"));
@@ -80,9 +80,32 @@ test("the fallback theme is pro-dark when no palette or theme is set", () => {
   expect(renderChart({ calls: [["plot", [[1], [1]]]] }, { outDir }).theme).toBe("pro-dark");
 });
 
+test("the tool reply carries the paths and the PNG image", () => {
+  const out = renderChart({ name: "reply", calls: [["plot", [[1, 2], [2, 1]]]] }, { outDir });
+  const reply = toToolReply(out);
+  expect(reply.text).toContain(out.pngPath ?? "");
+  expect(reply.image?.mime).toBe("image/png");
+  expect(reply.image?.name).toBe(out.pngPath?.split("/").pop() ?? "");
+  expect(reply.image?.uri.startsWith("data:image/png;base64,")).toBe(true);
+});
+
+test("an SVG-only reply has paths and no image", () => {
+  const out = renderChart({ calls: [["plot", [[1, 2], [2, 1]]]], format: "svg" }, { outDir });
+  const reply = toToolReply(out);
+  expect(reply.text).toContain(out.svgPath ?? "");
+  expect(reply.image).toBeUndefined();
+});
+
+test("a bad argument reports the call index", () => {
+  expect(() => renderChart({ calls: [["plot", [{ $dates: "x" }, [1]]]] }, { outDir })).toThrow(
+    /calls\[0\] plot: \$dates expects an array/,
+  );
+  expect(() => renderChart({ calls: [["sca", [9]]] }, { outDir })).toThrow(/calls\[0\] sca: no Axes 9/);
+});
+
 test("unknown methods and kwargs are reported with the call index", () => {
   expect(() => renderChart({ calls: [["plot", [[1], [1]]], ["violinplot", [[1]]]] }, { outDir })).toThrow(/calls\[1\] violinplot: unknown call/);
-  expect(() => renderChart({ calls: [["plot", [[1], [1]], { colour: "red" }]] }, { outDir })).toThrow(/calls\[0\] plot: .*colour/);
+  expect(() => renderChart({ calls: [["plot", [[1], [1]], { linewdith: 2 }]] }, { outDir })).toThrow(/calls\[0\] plot: .*linewdith/);
   expect(() => renderChart({ theme: "nope", calls: [] }, { outDir })).toThrow(/unknown theme/);
   expect(() => renderChart({ scale: 10, calls: [] }, { outDir })).toThrow(/scale must be between/);
   const unwrapped = ["bar", ["a", "b"], [3, 7]] as never;

@@ -1,10 +1,10 @@
 /** OpenCode Plugin part: registers the mpl tool and the mpl-charts skill. */
 import { homedir } from "node:os";
-import { basename, isAbsolute, join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { Plugin, Skill, Tool } from "@opencode/plugin/effect";
 import { Effect, Schema } from "effect";
 import { readPalette } from "./palette.js";
-import { defaultChartDir, renderChart, type MplRenderInput } from "./render.js";
+import { defaultChartDir, renderChart, toToolReply, type MplRenderInput } from "./render.js";
 import { SKILL_CONTENT, SKILL_DESCRIPTION, SKILL_ID, SKILL_NAME } from "./skill.js";
 
 const NAMESPACE = "mpl";
@@ -88,20 +88,10 @@ export default Plugin.define({
               if (!render.ok) return yield* Effect.fail(new Tool.Error({ message: render.message }));
 
               const result = render.value;
-              const paths = [result.pngPath, result.svgPath].filter((path): path is string => typeof path === "string");
-              const details = [
-                `theme: ${result.theme}`,
-                ...(result.width !== undefined && result.height !== undefined ? [`size: ${result.width}x${result.height}`] : []),
-                ...paths,
-              ];
-              const content: Tool.Content[] = [{ type: "text", text: details.join("\n") }];
-              if (result.png && result.pngPath) {
-                content.push({
-                  type: "file",
-                  uri: `data:image/png;base64,${Buffer.from(result.png).toString("base64")}`,
-                  mime: "image/png",
-                  name: basename(result.pngPath),
-                });
+              const reply = toToolReply(result);
+              const content: Tool.Content[] = [{ type: "text", text: reply.text }];
+              if (reply.image) {
+                content.push({ type: "file", ...reply.image });
               }
 
               return {

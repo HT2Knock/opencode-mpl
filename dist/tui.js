@@ -5,6 +5,9 @@ import { Plugin } from "@opencode/plugin/tui";
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
+function seriesStep(mode) {
+  return mode === "dark" ? 400 : 600;
+}
 function palettePath(env = process.env) {
   const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
   return join(dataHome, "opencode", "mpl", "palette.json");
@@ -27,7 +30,7 @@ var tui_default = Plugin.define({
   id: "mpl-tui",
   async setup(context) {
     const theme = context.theme;
-    const step = context.themeMode === "dark" ? 400 : 600;
+    const step = seriesStep(context.themeMode);
     const palette = {
       mode: context.themeMode,
       background: hex(theme.background.base),

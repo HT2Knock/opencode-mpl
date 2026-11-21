@@ -1,7 +1,7 @@
 /** Renders a chart spec to PNG/SVG files. No plugin imports, so tests drive it directly. */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { availableStyles, registerColormapRgba, registerColormaps, registerFonts } from "mpl";
 import { allColormaps } from "mpl/colormaps/all";
 import { allColormapRgba } from "mpl/colormaps/all.rgba";
@@ -17,11 +17,6 @@ registerColormapRgba(...allColormapRgba);
 export const MPL_DEFAULT_SCALE = 2;
 /** Every accepted theme name: mpl's bundled styles (pro-slate, pro-dark, ggplot, ...), plus "default". */
 export const MPL_THEMES: readonly string[] = [...availableStyles().filter((s) => s !== "default"), "default"];
-
-/** Fallback theme name, used when the tool input has no theme and no palette is stored. */
-export function defaultThemeName(env: NodeJS.ProcessEnv = process.env): string {
-  return fallbackStyle(env);
-}
 
 function themeStyle(theme: string): unknown {
   if (theme === "default") return [];
@@ -70,6 +65,30 @@ function fileStem(name: string | undefined, now: Date): string {
   return `${slug}-${now.toISOString().slice(11, 19).replaceAll(":", "")}`;
 }
 
+export interface MplToolReply {
+  readonly text: string;
+  readonly image?: { readonly uri: string; readonly mime: string; readonly name: string };
+}
+
+/** The content the tool returns: paths always, the PNG image when one was written. */
+export function toToolReply(result: MplRenderOutput): MplToolReply {
+  const paths = [result.pngPath, result.svgPath].filter((path): path is string => typeof path === "string");
+  const text = [
+    `theme: ${result.theme}`,
+    ...(result.width !== undefined && result.height !== undefined ? [`size: ${result.width}x${result.height}`] : []),
+    ...paths,
+  ].join("\n");
+  if (!result.png || !result.pngPath) return { text };
+  return {
+    text,
+    image: {
+      uri: `data:image/png;base64,${Buffer.from(result.png).toString("base64")}`,
+      mime: "image/png",
+      name: basename(result.pngPath),
+    },
+  };
+}
+
 /** PNG width and height from the IHDR chunk. */
 function pngSize(png: Uint8Array): { width: number; height: number } {
   const view = new DataView(png.buffer, png.byteOffset, png.byteLength);
@@ -80,7 +99,7 @@ function pngSize(png: Uint8Array): { width: number; height: number } {
 function resolveStyle(input: MplRenderInput, options: MplRenderOptions): { style: unknown; theme: string } {
   if (input.theme !== undefined) return { style: themeStyle(input.theme), theme: input.theme };
   if (options.palette) return { style: styleFromPalette(options.palette), theme: `opencode-${options.palette.mode}` };
-  const fallback = defaultThemeName();
+  const fallback = fallbackStyle();
   return { style: themeStyle(fallback), theme: fallback };
 }
 

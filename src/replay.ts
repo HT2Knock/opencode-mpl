@@ -162,11 +162,11 @@ export function buildFigure(spec: MplFigureSpec): Figure {
           `e.g. ["bar", [["a", "b"], [3, 7]], { color: "C1" }]`,
       );
     }
-    const args = args0.map(decodeValue);
     try {
+      const args = args0.map(decodeValue);
       if (fn === "sca") {
         const i = args[0];
-        if (typeof i !== "number" || !axes[i]) throw new MplSpecError(`sca: no Axes ${String(i)} (have ${axes.length})`);
+        if (typeof i !== "number" || !axes[i]) throw new MplSpecError(`no Axes ${String(i)} (have ${axes.length})`);
         ax = axes[i] as Axes;
         return;
       }
@@ -185,7 +185,7 @@ export function buildFigure(spec: MplFigureSpec): Figure {
         // ["$date_x", [locator, locatorKwargs?, formatter?]]: formatter is a strftime string or "concise"
         const [name, lkw, fmt] = args0 as [string, Record<string, unknown> | undefined, string | undefined];
         const Loc = DATE_LOCATORS[name];
-        if (!Loc) throw new MplSpecError(`$date_x: unknown locator ${name}; use one of ${Object.keys(DATE_LOCATORS).join(", ")}`);
+        if (!Loc) throw new MplSpecError(`unknown locator ${name}; use one of ${Object.keys(DATE_LOCATORS).join(", ")}`);
         const loc = new Loc(lkw ?? {});
         ax.xaxis.set_major_locator(loc as never);
         if (fmt === "concise") ax.xaxis.set_major_formatter(new ConciseDateFormatter(loc as never, {}) as never);
@@ -200,8 +200,8 @@ export function buildFigure(spec: MplFigureSpec): Figure {
           const mappable = [...ax.artists]
             .reverse()
             .find((a) => a.kind === "image" || (a.kind === "scatter" && a.mappable.kind === "some"));
-          if (!mappable) throw new MplSpecError("fig.colorbar: no imshow or colour-mapped scatter on the current Axes");
-          (fig as unknown as Dyn).colorbar?.(mappable, ...(Object.keys(kw).length ? [kw] : []));
+          if (!mappable) throw new MplSpecError("no imshow or color-mapped scatter on the current Axes");
+          (fig as unknown as Dyn).colorbar?.(...withKwargs([mappable], kw));
           return;
         }
         (fig as unknown as Dyn)[name]?.(...withKwargs(args, kw));

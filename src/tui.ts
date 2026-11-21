@@ -1,6 +1,6 @@
 /** TUI part: writes the active OpenCode theme for the server renderer, once per TUI load. */
 import { Plugin } from "@opencode/plugin/tui";
-import { writePalette } from "./palette.js";
+import { seriesStep, writePalette } from "./palette.js";
 
 interface Rgba {
   toInts(): [number, number, number, number];
@@ -15,7 +15,7 @@ export default Plugin.define({
   id: "mpl-tui",
   async setup(context) {
     const theme = context.theme;
-    const step = context.themeMode === "dark" ? 400 : 600;
+    const step = seriesStep(context.themeMode);
     const palette = {
       mode: context.themeMode,
       background: hex(theme.background.base),

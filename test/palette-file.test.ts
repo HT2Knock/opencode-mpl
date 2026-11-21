@@ -1,5 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { isPalette, palettePath, readPalette, writePalette, type Palette } from "../src/palette";
@@ -25,7 +25,9 @@ test("a written palette reads back", () => {
 test("the palette file is valid JSON with no temporary file left behind", () => {
   const env = { ...process.env, XDG_DATA_HOME: home };
   writePalette(palette, env);
-  expect(JSON.parse(readFileSync(palettePath(env), "utf8"))).toEqual(palette);
+  const path = palettePath(env);
+  expect(JSON.parse(readFileSync(path, "utf8"))).toEqual(palette);
+  expect(readdirSync(dirname(path)).filter((name) => name.endsWith(".tmp"))).toEqual([]);
 });
 
 test("a missing file reads as undefined", () => {

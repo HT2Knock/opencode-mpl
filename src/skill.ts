@@ -26,7 +26,7 @@ replays matplotlib calls in order, writes PNG and/or SVG, and returns the image 
   makes it current.
 - Figure calls take a \`fig.\` prefix: \`fig.text\`, \`fig.suptitle\`, \`fig.supxlabel\`,
   \`fig.supylabel\`, \`fig.subplots_adjust\`, \`fig.autofmt_xdate\`, \`fig.tight_layout\`,
-  \`fig.colorbar\`. \`fig.colorbar\` maps the last imshow or colour-mapped scatter on the current Axes.
+  \`fig.colorbar\`. \`fig.colorbar\` maps the last imshow or color-mapped scatter on the current Axes.
 - Values: \`{ "$float": "nan" }\` is NaN. \`{ "$transform": "axes" }\` is \`ax.transAxes\`.
 - \`theme\`: a bundled style name, such as \`pro-dark\`, \`pro-slate\` or any matplotlib style.
   Leave it out to use the active OpenCode theme.
@@ -55,10 +55,10 @@ image line (\`![name](path)\`) when the user should see it in the transcript.
   \`["$date_x", ["MonthLocator", { interval: 1 }, "%b %d" | "concise"]]\`.
 - \`annotate\` takes epoch days (ms / 86400000) as coordinates.
 
-## Colours
+## Colors
 
-Series colours follow the active theme: \`C0\`..\`C7\` are the theme's categorical colours, in order.
-Name a colour only when it carries meaning (red for a failure, green for a pass). Do not hard-code
+Series colors follow the active theme: \`C0\`..\`C7\` are the theme's categorical colors, in order.
+Name a color only when it carries meaning (red for a failure, green for a pass). Do not hard-code
 a palette.
 
 ## Chart types

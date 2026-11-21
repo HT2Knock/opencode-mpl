@@ -1,4 +1,4 @@
-/** OpenCode theme palette to an mpl style. All colours are opaque and theme-derived. */
+/** OpenCode theme palette to an mpl style. All colors are opaque and theme-derived. */
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -14,14 +14,14 @@ export interface Palette {
 }
 
 
-/** Hue step used for series colours: bright on dark backgrounds, deeper on light ones. */
+/** Hue step used for series colors: bright on dark backgrounds, deeper on light ones. */
 export function seriesStep(mode: Palette["mode"]): number {
   return mode === "dark" ? 400 : 600;
 }
 
 function bareHex(value: string, name: string): string {
   const hex = value.startsWith("#") ? value.slice(1) : value;
-  if (!/^[0-9a-f]{6}$/i.test(hex)) throw new Error(`palette ${name} must be a hex colour, got ${JSON.stringify(value)}`);
+  if (!/^[0-9a-f]{6}$/i.test(hex)) throw new Error(`palette ${name} must be a hex color, got ${JSON.stringify(value)}`);
   return hex.toLowerCase();
 }
 
@@ -42,7 +42,7 @@ export function isPalette(value: unknown): value is Palette {
 
 /**
  * Builds .mplstyle text from a palette. The layout keys match the bundled pro styles,
- * so a themed chart keeps matplotlib's look and only the colours change.
+ * so a themed chart keeps matplotlib's look and only the colors change.
  */
 export function styleFromPalette(palette: Palette): string {
   const background = bareHex(palette.background, "background");

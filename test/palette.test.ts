@@ -32,10 +32,10 @@ test("the style keeps the pro layout keys", () => {
   }
 });
 
-test("a non-hex colour is rejected", () => {
-  expect(() => styleFromPalette({ ...dark, background: "sky" })).toThrow(/background must be a hex colour/);
+test("a non-hex color is rejected", () => {
+  expect(() => styleFromPalette({ ...dark, background: "sky" })).toThrow(/background must be a hex color/);
 });
 
-test("hex colours with and without # are both accepted", () => {
+test("hex colors with and without # are both accepted", () => {
   expect(styleFromPalette({ ...dark, border: "2F3549" })).toContain("grid.color: 2f3549");
 });
