@@ -1,0 +1,4 @@
+node_modules/
+.mpl/
+*.log
+.DS_Store

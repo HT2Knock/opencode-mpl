@@ -1,0 +1,96 @@
+import { afterAll, expect, test } from "bun:test";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { MPL_THEMES, renderChart } from "../src/render";
+import type { Palette } from "../src/palette";
+
+const outDir = mkdtempSync(join(tmpdir(), "opencode-mpl-test-"));
+afterAll(() => rmSync(outDir, { recursive: true, force: true }));
+
+const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
+
+const palette: Palette = {
+  mode: "dark",
+  background: "#1a1b26",
+  text: "#c0caf5",
+  muted: "#565f89",
+  border: "#2f3549",
+  categorical: ["#7aa2f7", "#bb9af7", "#9ece6a"],
+};
+
+test("the bundled themes include pro-slate and pro-dark", () => {
+  for (const name of ["pro-slate", "pro-dark"]) expect(MPL_THEMES.includes(name)).toBe(true);
+});
+
+for (const theme of ["pro-slate", "pro-dark"]) {
+  test(`renders a grid with dates in ${theme}`, () => {
+    const days = ["2026-10-01", "2026-10-02", "2026-10-03"];
+    const out = renderChart(
+      {
+        theme,
+        name: theme,
+        format: "both",
+        grid: { rows: 1, cols: 2, width_ratios: [2, 1] },
+        calls: [
+          ["plot", [{ $dates: days }, [1, 3, 2]], { label: "a" }],
+          ["$concise_x", []],
+          ["legend", []],
+          ["sca", [1]],
+          ["bar", [["x", "y"], [2, 1]]],
+          ["fig.suptitle", ["t"]],
+        ],
+      },
+      { outDir },
+    );
+    expect([...(out.png ?? []).slice(0, 4)]).toEqual(PNG_MAGIC);
+    expect(out.width).toBe(1440);
+    expect(out.height).toBe(840);
+    expect(out.pngPath && existsSync(out.pngPath)).toBe(true);
+    expect(out.svgPath && readFileSync(out.svgPath, "utf8").includes("<svg")).toBe(true);
+  });
+}
+
+test("a stored palette themes the figure without a theme input", () => {
+  const out = renderChart({ calls: [["plot", [[1, 2, 3], [3, 1, 2]]]] }, { outDir, palette });
+  expect(out.theme).toBe("opencode-dark");
+  expect([...(out.png ?? []).slice(0, 4)]).toEqual(PNG_MAGIC);
+});
+
+test("a theme input wins over the palette", () => {
+  const out = renderChart({ theme: "pro-slate", calls: [["plot", [[1, 2], [2, 1]]]] }, { outDir, palette });
+  expect(out.theme).toBe("pro-slate");
+});
+
+test("two palettes give different pixels", () => {
+  const calls = [["bar", [["a", "b"], [3, 7]]]] as const;
+  const light: Palette = { ...palette, mode: "light", background: "#fbfbfd", text: "#1f2233", muted: "#6b7085", border: "#c9ccd8" };
+  const a = renderChart({ calls }, { outDir, palette });
+  const b = renderChart({ calls }, { outDir, palette: light });
+  expect(Buffer.compare(Buffer.from(a.png ?? []), Buffer.from(b.png ?? []))).not.toBe(0);
+});
+
+test("format svg writes only the SVG", () => {
+  const out = renderChart({ calls: [["plot", [[1, 2], [2, 1]]]], format: "svg" }, { outDir });
+  expect(out.pngPath).toBeUndefined();
+  expect(out.svgPath && existsSync(out.svgPath)).toBe(true);
+});
+
+test("the fallback theme is pro-dark when no palette or theme is set", () => {
+  expect(renderChart({ calls: [["plot", [[1], [1]]]] }, { outDir }).theme).toBe("pro-dark");
+});
+
+test("unknown methods and kwargs are reported with the call index", () => {
+  expect(() => renderChart({ calls: [["plot", [[1], [1]]], ["violinplot", [[1]]]] }, { outDir })).toThrow(/calls\[1\] violinplot: unknown call/);
+  expect(() => renderChart({ calls: [["plot", [[1], [1]], { colour: "red" }]] }, { outDir })).toThrow(/calls\[0\] plot: .*colour/);
+  expect(() => renderChart({ theme: "nope", calls: [] }, { outDir })).toThrow(/unknown theme/);
+  expect(() => renderChart({ scale: 10, calls: [] }, { outDir })).toThrow(/scale must be between/);
+  const unwrapped = ["bar", ["a", "b"], [3, 7]] as never;
+  expect(() => renderChart({ calls: [unwrapped] }, { outDir })).toThrow(/wrap all positional args in one array/);
+});
+
+test("the default directory is dated under the OpenCode data dir", () => {
+  const out = renderChart({ name: "dated", calls: [["plot", [[1], [1]]]] });
+  expect(out.pngPath).toMatch(/opencode\/mpl\/charts\/\d{4}-\d{2}-\d{2}\/dated-\d{6}\.png$/);
+  if (out.pngPath) rmSync(out.pngPath, { force: true });
+});

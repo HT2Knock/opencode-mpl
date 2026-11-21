@@ -1,0 +1,46 @@
+{
+  "name": "opencode-mpl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenCode plugin: matplotlib-style charts from the mpl renderer (pure JavaScript, pixel-exact)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./tui": "./dist/tui.js",
+    "./rpc": "./dist/rpc.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "opencode": {
+    "host": ">=2.3.2 <2.4.0"
+  },
+  "scripts": {
+    "setup": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install",
+    "build": "bun scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "check": "bun run typecheck && bun run test"
+  },
+  "devDependencies": {
+    "@opencode/plugin": "2.3.2",
+    "@opencode/schema": "2.3.2",
+    "@types/bun": "^1.4.4",
+    "@types/node": "^24.19.2",
+    "effect": "4.1.0",
+    "esbuild": "^0.28.2",
+    "mpl": "github:ivarvong/mpl#689ebd4",
+    "typescript": "^5.9.2"
+  },
+  "peerDependencies": {
+    "@opencode/plugin": ">=2.3.2",
+    "effect": "4.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
