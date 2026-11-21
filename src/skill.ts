@@ -21,6 +21,9 @@ replays matplotlib calls in order, writes PNG and/or SVG, and returns the image 
 - \`calls\`: \`[method, [positional args], {kwargs}]\`, applied in order to the current Axes.
   \`ax.plot(x, y, "o-", label="a")\` is \`["plot", [x, y, "o-"], { label: "a" }]\`.
   Wrap every positional argument in the one array: \`["bar", [["a", "b"], [3, 7]], { color: "C1" }]\`.
+  Positional arguments stop where mpl's signature stops: \`bar(x, height)\` and \`barh(y, width)\`.
+  Put \`width\`, \`bottom\`, \`left\`, and every style option in the kwargs object. A third
+  positional is read as the kwargs object, so the real keywords would be dropped.
 - \`grid\`: \`{ rows, cols, sharex?, sharey?, width_ratios?, height_ratios? }\`. Axes are numbered
   row-major from 0; \`["sca", [i]]\` makes Axes i current; \`["twinx", []]\` adds a twin and
   makes it current.
@@ -69,6 +72,10 @@ for distributions use hist or boxplot; for legend placement use \`loc\` and \`nc
 
 ## Gotchas
 
+- Grouped bars need numeric positions. Offset each series by half the bar width, then set the
+  ticks and labels: \`bar([-w/2, 1-w/2], ...)\` and \`bar([w/2, 1+w/2], ...)\` with
+  \`set_xticks([0, 1])\` and \`set_xticklabels(["a", "b"])\`. Bars from categorical strings
+  place both series on the same x.
 - Unknown kwargs and rc keys throw, as in matplotlib; the error names the call index and the
   offending key.
 - Scatter legend: label a proxy \`["plot", [[], [], "o"], { color: "C0", label: "name" }]\`

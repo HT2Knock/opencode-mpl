@@ -71,6 +71,15 @@ export const MPL_FIGURE_METHODS: ReadonlySet<string> = new Set(
 /** Pseudo-calls the replayer handles itself. */
 export const MPL_SPECIAL_CALLS = ["sca", "twinx", "$concise_x", "$date_x"] as const;
 
+/**
+ * Methods whose mpl signature ends with the kwargs object. A call that passes more
+ * positionals replaces that object, and mpl then reads no keyword at all.
+ */
+const KWARGS_POSITION = new Map([
+  ["bar", 2],
+  ["barh", 2],
+]);
+
 const DATE_LOCATORS: Readonly<Record<string, new (kw?: unknown) => unknown>> = {
   AutoDateLocator: AutoDateLocator as never,
   YearLocator: YearLocator as never,
@@ -160,6 +169,13 @@ export function buildFigure(spec: MplFigureSpec): Figure {
       throw new MplSpecError(
         `calls[${index}] ${fn}: expected [method, [positional args], {kwargs}]; wrap all positional args in one array, ` +
           `e.g. ["bar", [["a", "b"], [3, 7]], { color: "C1" }]`,
+      );
+    }
+    const limit = KWARGS_POSITION.get(fn);
+    if (limit !== undefined && args0.length > limit) {
+      throw new MplSpecError(
+        `calls[${index}] ${fn}: ${fn} takes ${limit} positional arguments, got ${args0.length}. ` +
+          `Put width, bottom, left, color, and label in the kwargs object.`,
       );
     }
     try {

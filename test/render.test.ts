@@ -111,6 +111,12 @@ test("a bad argument reports the call index", () => {
   expect(() => renderChart({ calls: [["sca", [9]]] }, { outDir })).toThrow(/calls\[0\] sca: no Axes 9/);
 });
 
+test("a positional width is rejected with the fix in the message", () => {
+  expect(() => renderChart({ calls: [["bar", [["a", "b"], [3, 7], 0.72]]] }, { outDir })).toThrow(
+    /calls\[0\] bar: bar takes 2 positional arguments, got 3\. Put width, bottom, left, color, and label in the kwargs object/,
+  );
+});
+
 test("unknown methods and kwargs are reported with the call index", () => {
   expect(() => renderChart({ calls: [["plot", [[1], [1]]], ["violinplot", [[1]]]] }, { outDir })).toThrow(/calls\[1\] violinplot: unknown call/);
   expect(() => renderChart({ calls: [["plot", [[1], [1]], { linewdith: 2 }]] }, { outDir })).toThrow(/calls\[0\] plot: .*linewdith/);
