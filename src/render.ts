@@ -49,6 +49,8 @@ export interface MplRenderOutput {
   readonly png?: Uint8Array;
   readonly pngPath?: string;
   readonly svgPath?: string;
+  /** JSON sidecar with the spec that produced the files. */
+  readonly specPath?: string;
   readonly width?: number;
   readonly height?: number;
   readonly theme: string;
@@ -129,5 +131,7 @@ export function renderChart(input: MplRenderInput, options: MplRenderOptions = {
     svgPath = join(outDir, `${stem}.svg`);
     writeFileSync(svgPath, fig.toSVG());
   }
-  return { png, pngPath, svgPath, theme, ...(png ? pngSize(png) : {}) };
+  const specPath = join(outDir, `${stem}.json`);
+  writeFileSync(specPath, JSON.stringify({ spec: input, resolvedTheme: theme, pngPath, svgPath }, null, 2));
+  return { png, pngPath, svgPath, specPath, theme, ...(png ? pngSize(png) : {}) };
 }

@@ -89,6 +89,14 @@ test("the tool reply carries the paths and the PNG image", () => {
   expect(reply.image?.uri.startsWith("data:image/png;base64,")).toBe(true);
 });
 
+test("a render writes a spec sidecar that replays", () => {
+  const out = renderChart({ name: "sidecar", theme: "pro-slate", calls: [["plot", [[1, 2], [2, 1]]]] }, { outDir });
+  expect(out.specPath && existsSync(out.specPath)).toBe(true);
+  const sidecar = JSON.parse(readFileSync(out.specPath ?? "", "utf8"));
+  expect(sidecar.spec.calls[0][0]).toBe("plot");
+  expect(sidecar.resolvedTheme).toBe("pro-slate");
+});
+
 test("an SVG-only reply has paths and no image", () => {
   const out = renderChart({ calls: [["plot", [[1, 2], [2, 1]]]], format: "svg" }, { outDir });
   const reply = toToolReply(out);

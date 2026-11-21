@@ -33,6 +33,7 @@ const RenderInput = Schema.Struct({
 const RenderOutput = Schema.Struct({
   pngPath: Schema.optional(Schema.String),
   svgPath: Schema.optional(Schema.String),
+  specPath: Schema.optional(Schema.String),
   width: Schema.optional(Schema.Number),
   height: Schema.optional(Schema.Number),
   theme: Schema.String,
@@ -98,6 +99,7 @@ export default Plugin.define({
                 output: {
                   ...(result.pngPath !== undefined ? { pngPath: result.pngPath } : {}),
                   ...(result.svgPath !== undefined ? { svgPath: result.svgPath } : {}),
+                  ...(result.specPath !== undefined ? { specPath: result.specPath } : {}),
                   ...(result.width !== undefined ? { width: result.width } : {}),
                   ...(result.height !== undefined ? { height: result.height } : {}),
                   theme: result.theme,

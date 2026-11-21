@@ -98,6 +98,10 @@ using `XDG_DATA_HOME` when it is set. A file is named `<stem>-<HHMMSS>.<ext>`,
 where the stem is the `name` input, lowercased with runs of punctuation replaced
 by a hyphen.
 
+Each render also writes `<stem>.json`, a sidecar with the input spec, the resolved theme,
+and the file paths. Replay the spec to reproduce the chart, and let tools check what was
+drawn without reading the image.
+
 The plugin does not delete charts. Remove the directory to clean up.
 
 ## Plugin option

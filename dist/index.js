@@ -16192,7 +16192,9 @@ function renderChart(input, options = {}) {
     svgPath = join2(outDir, `${stem}.svg`);
     writeFileSync2(svgPath, fig.toSVG());
   }
-  return { png, pngPath, svgPath, theme, ...png ? pngSize(png) : {} };
+  const specPath = join2(outDir, `${stem}.json`);
+  writeFileSync2(specPath, JSON.stringify({ spec: input, resolvedTheme: theme, pngPath, svgPath }, null, 2));
+  return { png, pngPath, svgPath, specPath, theme, ...png ? pngSize(png) : {} };
 }
 
 // src/skill.ts
@@ -16298,6 +16300,7 @@ var RenderInput = Schema.Struct({
 var RenderOutput = Schema.Struct({
   pngPath: Schema.optional(Schema.String),
   svgPath: Schema.optional(Schema.String),
+  specPath: Schema.optional(Schema.String),
   width: Schema.optional(Schema.Number),
   height: Schema.optional(Schema.Number),
   theme: Schema.String
@@ -16346,6 +16349,7 @@ var index_default = Plugin.define({
             output: {
               ...result.pngPath !== void 0 ? { pngPath: result.pngPath } : {},
               ...result.svgPath !== void 0 ? { svgPath: result.svgPath } : {},
+              ...result.specPath !== void 0 ? { specPath: result.specPath } : {},
               ...result.width !== void 0 ? { width: result.width } : {},
               ...result.height !== void 0 ? { height: result.height } : {},
               theme: result.theme
