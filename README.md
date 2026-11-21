@@ -1,63 +1,34 @@
 # opencode-mpl
 
-An OpenCode plugin that draws charts with
-[mpl](https://github.com/ivarvong/mpl), a pure-JavaScript reimplementation of
-matplotlib 3.11. The model writes a JSON figure spec; the plugin replays it,
-writes PNG/SVG, and returns the image plus the file paths.
+Charts inside OpenCode, drawn by [mpl](https://github.com/ivarvong/mpl), a pure
+JavaScript reimplementation of matplotlib 3.11. The model writes a figure spec,
+the plugin replays the matplotlib calls, and you get a PNG or an SVG file plus
+the image in the conversation.
 
-The plugin is a port of
+The plugin ports
 [Dillon Mulroy's Pi extension](https://github.com/dmmulroy/.dotfiles/tree/main/home/.pi/agent/extensions/mpl)
 to the OpenCode 2 plugin API. It runs no Python and no browser.
 
-## What you get
-
-- `tools.mpl.render` inside Code Mode, plus a short `mpl-charts` skill the model
-  reads first.
-- matplotlib's object API: `plot`, `bar`, `barh`, `scatter`, `hist`, `boxplot`,
-  `errorbar`, `fill_between`, `imshow`, `annotate`, text, reference lines,
-  subplot grids, twin axes, dates.
-- PNG at 2x by default (1440x840) and SVG.
-- Charts coloured by the active OpenCode theme, with a fallback style for
-  headless runs.
-
 ## Install
 
-From a local checkout:
+Use a local checkout:
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
-{
-  "plugins": ["/Users/you/personal/opencode-mpl"],
-}
+{ "plugins": ["/Users/you/personal/opencode-mpl"] }
 ```
 
-Or from Git, because `dist/` is committed:
+Or install the tagged build from GitHub. `dist/` is committed, so the install
+runs no build step:
 
 ```sh
-opencode plugin add github:HT2Knock/opencode-mpl#v0.1.0
+opencode plugin add github:HT2Knock/opencode-mpl#v0.1.1
 ```
 
-Requires OpenCode `>=2.3.2 <2.4.0` and Node `>=22` for development.
+The plugin requires OpenCode 2.3.2 or newer, and older than 2.4.0.
 
-## Options
+## Draw a chart
 
-```jsonc
-{
-  "plugins": [
-    {
-      "package": "/Users/you/personal/opencode-mpl",
-      "options": { "outputDir": "outputs/charts" },
-    },
-  ],
-}
-```
-
-- `outputDir`: where charts are written. Default
-  `~/.local/share/opencode/mpl/charts/<YYYY-MM-DD>/`. A relative path resolves
-  against the session location.
-
-## Use
-
-In a Code Mode session:
+Ask for a chart, or call the tool inside Code Mode:
 
 ```js
 const r = await tools.mpl.render({
@@ -78,56 +49,37 @@ const r = await tools.mpl.render({
 return r.pngPath;
 ```
 
-The transcript draws the image when `session.image_preview` is on. The reply
-always carries the saved path, so it works without the preview too.
+The spec follows matplotlib's object API. Read the `mpl-charts` skill for the
+call list, date handling, and the common mistakes. The tool writes the file and
+returns the image and the paths. To see the image in the transcript, turn on
+`session.image_preview` in the CLI settings.
 
 ## Theme
 
-A `./tui` part reads the active OpenCode theme and writes
-`~/.local/share/opencode/mpl/palette.json`. The renderer reads that file and
-maps `background.base`, `text.base`, `text.muted`, `border.base`, and the
-`categorical` hues (step 400 on dark, 600 on light) into an mpl style.
-`C0`..`C7` follow the theme.
+Charts use the colors of the active OpenCode theme. The TUI part writes the
+palette, and the renderer reads it at each call. Without a palette, the plugin
+uses a bundled dark or light style based on `theme.mode` in your CLI settings.
+Read [how the theme reaches a chart](docs/theme.md).
 
-The file bridge does not depend on the TUI lifetime, so `opencode run` gets the
-palette too after the TUI has started once with this plugin. A theme change
-reaches the chart after the next TUI start.
+## Reference
 
-When no palette file exists, the plugin reads `theme.mode` from
-`~/.config/opencode/cli.json` and uses `pro-slate` for light and `pro-dark` for
-dark. `system` counts as dark.
-
-A `theme` in the tool input selects a bundled mpl style (`pro-dark`,
-`pro-slate`, any matplotlib style) and overrides the palette.
-
-## Layout
-
-| Path               | Purpose                                               |
-| ------------------ | ----------------------------------------------------- |
-| `src/index.ts`     | Plugin part: tool and skill                           |
-| `src/render.ts`    | Spec to PNG/SVG files                                 |
-| `src/replay.ts`    | Spec replay with the Axes/Figure allow-list           |
-| `src/palette.ts`   | Theme tokens to `.mplstyle`, fallback from `cli.json` |
-| `src/tui.ts`       | TUI part: writes the theme palette                    |
-| `src/skill.ts`     | `mpl-charts` skill text                               |
-| `scripts/build.ts` | esbuild bundle into `dist/`                           |
-| `test/`            | bun tests                                             |
+[tool, options, files, and errors](docs/reference.md).
 
 ## Development
 
-`mpl` is not on npm and builds `dist/` in a `prepare` script. Bun blocks that
-script, so install with npm:
+`mpl` is not on npm and builds its `dist/` in a `prepare` script. Bun blocks
+that script, so install with npm.
 
 ```sh
-npm run setup      # npm install; builds mpl from github:ivarvong/mpl
-bun run check      # typecheck and tests
-bun run build      # rebuild dist/
+npm run setup
+bun run check
+bun run build
 ```
 
-`dist/` is committed because OpenCode loads the plugin from Git without a build
-step. Run `bun run build` after a source change.
+Commit `dist/` with every source change. OpenCode loads the plugin from Git
+without a build step.
 
 ## License
 
-MIT for this plugin. The bundle includes mpl (ISC) and its fonts and style
-tables; see `THIRD_PARTY_NOTICES.md`.
+MIT. The bundle includes mpl (ISC) and its fonts and style tables. Read
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

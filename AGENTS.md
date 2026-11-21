@@ -23,6 +23,14 @@
   `execute` call that renders a chart. A passing test is not proof that the
   plugin loaded.
 
+## Docs
+
+- `README.md` is a landing page: what the plugin is, install, one example, links.
+- `docs/reference.md` holds the tool fields, options, files, and errors. Keep it dry.
+- `docs/theme.md` explains why the palette travels through a file. Keep opinion there only.
+- Apply the technical writing rules to every document. No em dashes, no slashes
+  between alternatives, sentence case headings.
+
 ## Style
 
 - Two spaces, double quotes, semicolons.
