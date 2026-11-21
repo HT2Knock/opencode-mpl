@@ -1,0 +1,134 @@
+[
+  {
+    "task": "stacked-bars",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 10,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/stacked-revenue-094509.png"
+  },
+  {
+    "task": "grouped-bars",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 7,
+    "errors": 2,
+    "theme": "opencode-dark",
+    "seconds": 33,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/grouped-pets-094541.png"
+  },
+  {
+    "task": "date-series",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 13,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/monthly-trend-094553.png"
+  },
+  {
+    "task": "heatmap-colorbar",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 10,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/matrix-heatmap-094605.png"
+  },
+  {
+    "task": "two-panels",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 12,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/two-panels-094616.png"
+  },
+  {
+    "task": "recovery",
+    "model": "opencode-go/deepseek-v4.1-flash",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 10,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/group-shape-095047.png"
+  },
+  {
+    "task": "stacked-bars",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 8,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/stacked-revenue-094646.png"
+  },
+  {
+    "task": "grouped-bars",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 34,
+    "errors": 2,
+    "theme": "opencode-dark",
+    "seconds": 189,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/grouped-pets-094954.png"
+  },
+  {
+    "task": "date-series",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 5,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/monthly-trend-095001.png"
+  },
+  {
+    "task": "heatmap-colorbar",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 5,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/matrix-heatmap-095006.png"
+  },
+  {
+    "task": "two-panels",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 2,
+    "theme": "opencode-dark",
+    "seconds": 8,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/two-panels-095013.png"
+  },
+  {
+    "task": "recovery",
+    "model": "github-copilot/claude-sonnet-5",
+    "ok": true,
+    "reasons": [],
+    "renders": 1,
+    "errors": 0,
+    "theme": "opencode-dark",
+    "seconds": 6,
+    "png": "/Users/ht2knock/.local/share/opencode/mpl/charts/2026-11-21/group-shape-095053.png"
+  }
+]

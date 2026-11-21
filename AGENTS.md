@@ -23,6 +23,14 @@
   `execute` call that renders a chart. A passing test is not proof that the
   plugin loaded.
 
+## Eval
+
+- `bun eval/run.ts` runs the agent tasks against the built `dist/`. Run `bun run build` first.
+- The eval reads the spec sidecar, not the reply. A task passes only when the figure passes
+  the scene checks.
+- Keep `dist/` unchanged while a baseline runs, or the results mix builds.
+- Write results under `eval/results/` and compare two runs by task and model, not by the total.
+
 ## Docs
 
 - `README.md` is a landing page: what the plugin is, install, one example, links.

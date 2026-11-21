@@ -76,6 +76,9 @@ bun run check
 bun run build
 ```
 
+`bun run eval` runs the agent eval: six chart tasks against two models, scored
+from the figure each run drew.
+
 Commit `dist/` with every source change. OpenCode loads the plugin from Git
 without a build step.
 

@@ -23,7 +23,8 @@
     "build": "bun scripts/build.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "check": "bun run typecheck && bun run test"
+    "check": "bun run typecheck && bun run test",
+    "eval": "bun eval/run.ts"
   },
   "devDependencies": {
     "@opencode/plugin": "2.3.2",
