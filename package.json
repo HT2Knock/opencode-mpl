@@ -23,7 +23,8 @@
     "build": "bun scripts/build.ts",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "check": "bun run typecheck && bun run test",
+    "comment:check": "bash scripts/comment-count.sh",
+    "check": "bun run comment:check && bun run typecheck && bun run test",
     "eval": "bun eval/run.ts"
   },
   "devDependencies": {
@@ -33,7 +34,7 @@
     "@types/node": "^24.19.2",
     "effect": "4.1.0",
     "esbuild": "^0.28.2",
-    "mpl": "github:ivarvong/mpl#689ebd4",
+    "mpl": "github:ivarvong/mpl#f1d9d97bb9c23d33da12eab36a751345c24d9d13",
     "typescript": "^5.9.2"
   },
   "peerDependencies": {

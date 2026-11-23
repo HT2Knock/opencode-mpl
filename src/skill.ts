@@ -1,7 +1,3 @@
-/**
- * The mpl-charts skill: the reference the model reads before the first chart.
- * Rewritten from the Pi extension's instruction string for OpenCode's Code Mode.
- */
 export const SKILL_ID = "mpl-charts";
 export const SKILL_NAME = "MPL charts";
 export const SKILL_DESCRIPTION =
@@ -20,10 +16,11 @@ replays matplotlib calls in order, writes PNG and/or SVG, and returns the image 
 
 - \`calls\`: \`[method, [positional args], {kwargs}]\`, applied in order to the current Axes.
   \`ax.plot(x, y, "o-", label="a")\` is \`["plot", [x, y, "o-"], { label: "a" }]\`.
-  Wrap every positional argument in the one array: \`["bar", [["a", "b"], [3, 7]], { color: "C1" }]\`.
-  Positional arguments stop where mpl's signature stops: \`bar(x, height)\` and \`barh(y, width)\`.
-  Put \`width\`, \`bottom\`, \`left\`, and every style option in the kwargs object. A third
-  positional is read as the kwargs object, so the real keywords would be dropped.
+  Wrap every positional argument in the one array. Positionals follow the mpl method's
+  matplotlib signature, so \`bar(x, height, width, bottom)\` is
+  \`["bar", [x, height, 0.72, [0, 0]], { label: "one" }]\`. Put a name in only one
+  place: a positional and a keyword with the same name throws, as does an argument the
+  method does not take.
 - \`grid\`: \`{ rows, cols, sharex?, sharey?, width_ratios?, height_ratios? }\`. Axes are numbered
   row-major from 0; \`["sca", [i]]\` makes Axes i current; \`["twinx", []]\` adds a twin and
   makes it current.

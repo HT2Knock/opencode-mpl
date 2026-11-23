@@ -27,7 +27,9 @@ bun eval/compare.ts eval/baseline.json eval/after.json
 1. The prompt runs with `opencode run --format json`.
 2. The plugin writes a JSON sidecar next to each chart.
 3. The runner takes the sidecars the run added to the default chart directory
-   and replays the newest one.
+   and replays the newest one. OpenCode may load the plugin from the global
+   config, where a project `outputDir` does not apply, so the default directory
+   is the only reliable place to look.
 4. `eval/scene.ts` reports what the figure contains: bar series and their bases,
    artist kinds, the legend, the labels, and the y tick labels.
 5. The task check turns those facts into a pass or a list of reasons.
@@ -66,6 +68,8 @@ the run directory has no data files.
 
 ## Limits
 
+- A task stops after 5 minutes with SIGKILL. A provider request can ignore
+  SIGTERM and hold the pipes open.
 - One run per task by default, so a pass rate is indicative, not statistical.
 - Two models with different strengths. A failure on both points at the tool or
   the skill. A failure on one points at the model.

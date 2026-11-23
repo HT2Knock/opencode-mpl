@@ -1,11 +1,4 @@
 #!/usr/bin/env bun
-/**
- * Agent eval: runs each task headless in a fresh project, then checks the figure
- * from the spec sidecar, not from the reply.
- *
- *   bun eval/run.ts
- *   bun eval/run.ts --tasks stacked-bars --models opencode-go/deepseek-v4.1-flash
- */
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -41,7 +34,6 @@ function list<T>(value: string | undefined, fallback: readonly T[]): readonly T[
   return value ? (value.split(",").map((s) => s.trim()).filter(Boolean) as unknown as T[]) : fallback;
 }
 
-/** Every chart file under the data directory, so a run can be isolated by time. */
 function chartFiles(): string[] {
   try {
     return readdirSync(CHARTS, { recursive: true })
@@ -72,7 +64,6 @@ async function runOne(task: Task, model: string): Promise<Row> {
     ["opencode", "run", "--format", "json", "--auto", "--archived", "--title", `eval ${task.id}`, "--model", model, task.prompt],
     { cwd: runDir, stdout: "pipe", stderr: "pipe" },
   );
-  // SIGKILL, because a provider request can ignore SIGTERM and hold the pipes open.
   const timer = setTimeout(() => proc.kill("SIGKILL"), TIMEOUT_MS);
   const [stdout, stderr] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()]);
   await proc.exited;
@@ -81,15 +72,13 @@ async function runOne(task: Task, model: string): Promise<Row> {
   const transcript = `${stdout}\n${stderr}`;
   writeFileSync(join(runDir, "transcript.jsonl"), transcript);
 
-  // The plugin may be loaded from the global config, where the project outputDir option
-  // does not apply. Take the files this run added to the default chart directory.
-  const fresh = chartFiles()
+  const newSidecars = chartFiles()
     .filter((path) => path.endsWith(".json") && !before.has(path))
     .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
   const errors = countErrors(transcript);
   const seconds = Math.round((Date.now() - started) / 1000);
 
-  if (fresh.length === 0) {
+  if (newSidecars.length === 0) {
     return {
       task: task.id,
       model,
@@ -103,7 +92,7 @@ async function runOne(task: Task, model: string): Promise<Row> {
     };
   }
 
-  const sidecar = JSON.parse(readFileSync(fresh[0]!, "utf8")) as {
+  const sidecar = JSON.parse(readFileSync(newSidecars[0]!, "utf8")) as {
     spec: Parameters<typeof factsFromSpec>[0];
     resolvedTheme: string;
     pngPath?: string;
@@ -111,22 +100,22 @@ async function runOne(task: Task, model: string): Promise<Row> {
   };
   const artifacts = join(runDir, "artifacts");
   mkdirSync(artifacts, { recursive: true });
-  copyFileSync(fresh[0]!, join(artifacts, "spec.json"));
+  copyFileSync(newSidecars[0]!, join(artifacts, "spec.json"));
   if (sidecar.pngPath) copyFileSync(sidecar.pngPath, join(artifacts, "chart.png"));
-  for (const path of fresh) {
+  for (const path of newSidecars) {
     const entry = JSON.parse(readFileSync(path, "utf8")) as { pngPath?: string; svgPath?: string };
     for (const file of [path, entry.pngPath, entry.svgPath]) {
       if (file && file.startsWith(CHARTS)) rmSync(file, { force: true });
     }
   }
   const facts = factsFromSpec(sidecar.spec, sidecar.resolvedTheme);
-  const reasons = task.check(facts, { renders: fresh.length, errors, transcript });
+  const reasons = task.check(facts, { renders: newSidecars.length, errors, transcript });
   return {
     task: task.id,
     model,
     ok: reasons.length === 0,
     reasons,
-    renders: fresh.length,
+    renders: newSidecars.length,
     errors,
     theme: sidecar.resolvedTheme,
     seconds,

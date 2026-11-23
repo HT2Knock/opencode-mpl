@@ -1,5 +1,4 @@
 #!/usr/bin/env bun
-/** Compares two eval result files by task and model. */
 import { readFileSync } from "node:fs";
 
 interface Row {

@@ -21,7 +21,7 @@ Or install the tagged build from GitHub. `dist/` is committed, so the install
 runs no build step:
 
 ```sh
-opencode plugin add github:HT2Knock/opencode-mpl#v0.2.0
+opencode plugin add github:HT2Knock/opencode-mpl#v0.2.1
 ```
 
 The plugin requires OpenCode 2.3.2 or newer, and older than 2.4.0.

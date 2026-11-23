@@ -32,18 +32,16 @@ Axes are numbered row by row from 0. Select one with `["sca", [index]]`.
 ### Call shape
 
 A call is `[method, [positional args], {kwargs}]`. A call holds at most three
-items, and the second item holds every positional argument.
+items, and the second item holds every positional argument. The positionals
+follow the mpl method's matplotlib signature; the trailing object holds the
+keywords. For example, `bar` takes `x, height, width?, bottom?`:
 
 ```js
-[
-  "bar",
-  [
-    ["a", "b"],
-    [3, 7],
-  ],
-  { color: "C1" },
-];
+["bar", [["a", "b"], [3, 7], 0.72, [0, 0]], { color: "C1", label: "one" }];
 ```
+
+A name given both positionally and as a keyword throws, as does an argument the
+method does not take. The error names the call index.
 
 The method is an Axes method, a Figure method with a `fig.` prefix, or a special
 call.
@@ -98,9 +96,9 @@ using `XDG_DATA_HOME` when it is set. A file is named `<stem>-<HHMMSS>.<ext>`,
 where the stem is the `name` input, lowercased with runs of punctuation replaced
 by a hyphen.
 
-Each render also writes `<stem>.json`, a sidecar with the input spec, the resolved theme,
-and the file paths. Replay the spec to reproduce the chart, and let tools check what was
-drawn without reading the image.
+Each render also writes `<stem>.json`, a sidecar with the input spec, the
+resolved theme, and the file paths. Replay the spec to reproduce the chart, and
+let tools check what was drawn without reading the image.
 
 The plugin does not delete charts. Remove the directory to clean up.
 

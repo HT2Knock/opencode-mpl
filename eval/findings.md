@@ -53,6 +53,17 @@ The tasks cover common chart shapes. They do not judge visual quality, tick
 overlap, or color choice. A chart that stacks correctly still passes with a
 legend over the bars.
 
+## The upstream fix
+
+mpl issue #86 is fixed in ivarvong/mpl#98. `bar(x, height, width, bottom)` and
+`barh(y, width, height, left)` now bind positionals as matplotlib does. mpl
+throws a TypeError when the keyword object is not a plain object or a method
+takes too many arguments. The plugin pins `f1d9d97` and no longer needs its own
+guard. The skill teaches the matplotlib form.
+
+The table above records runs with the guard. Do not compare a new run against
+it without noting the difference.
+
 ## Next
 
 - Add the pim chart as a task: eight series, thirteen months, two panels.

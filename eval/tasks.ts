@@ -1,10 +1,7 @@
-/** The eval tasks: a prompt, and checks against the figure the agent actually drew. */
 import { covers, isStacked, tallestColumn, type Facts } from "./scene";
 
 export interface RunInfo {
-  /** Renders that wrote a spec sidecar. */
   readonly renders: number;
-  /** Loud errors in the transcript, such as an unknown call or an unknown keyword. */
   readonly errors: number;
   readonly transcript: string;
 }

@@ -1,4 +1,3 @@
-/** Figure facts for the eval: what the spec actually drew, not what the reply says. */
 import { registerFonts } from "mpl";
 import { allFonts } from "mpl/fonts/all";
 import { buildFigure } from "../src/replay";
@@ -9,6 +8,7 @@ registerFonts(...allFonts);
 export interface BarFact {
   readonly label: string | null;
   readonly y: readonly number[];
+  readonly w: readonly number[];
   readonly h: readonly number[];
 }
 
@@ -28,6 +28,7 @@ interface Artist {
   readonly kind: string;
   readonly label?: { readonly kind: string; readonly text?: string };
   readonly y?: Float64Array;
+  readonly w?: Float64Array;
   readonly h?: Float64Array;
 }
 
@@ -46,7 +47,6 @@ function walk(nodes: readonly Node[], visit: (node: Node) => void): void {
 
 const NUMERIC = /^-?\d+(?:\.\d+)?$/;
 
-/** Builds the figure and reports the artists, the legend, and the y tick labels. */
 export function factsFromSpec(spec: MplRenderInput, theme: string): Facts {
   const fig = buildFigure({
     style: [],
@@ -65,8 +65,8 @@ export function factsFromSpec(spec: MplRenderInput, theme: string): Facts {
       kinds[artist.kind] = (kinds[artist.kind] ?? 0) + 1;
       const label = artist.label?.kind === "text" ? (artist.label.text ?? null) : null;
       if (label) labeled += 1;
-      if (artist.kind === "bar" && artist.y && artist.h) {
-        bars.push({ label, y: Array.from(artist.y), h: Array.from(artist.h) });
+      if (artist.kind === "bar" && artist.y && artist.w && artist.h) {
+        bars.push({ label, y: Array.from(artist.y), w: Array.from(artist.w), h: Array.from(artist.h) });
       }
     }
   }
@@ -91,7 +91,6 @@ export function factsFromSpec(spec: MplRenderInput, theme: string): Facts {
   };
 }
 
-/** True when every bar after the first starts where the previous one ends. */
 export function isStacked(bars: readonly BarFact[]): boolean {
   if (bars.length < 2) return false;
   for (let i = 1; i < bars.length; i++) {
@@ -105,15 +104,10 @@ export function isStacked(bars: readonly BarFact[]): boolean {
   return true;
 }
 
-/**
- * True when the reported ticks can cover a value. The axis top lies at or above the
- * last tick, so a value past the last tick plus one step is clipped.
- */
 export function covers(facts: Facts, value: number): boolean {
   return value <= facts.tickMax + facts.tickStep;
 }
 
-/** The tallest column total across the bar series. */
 export function tallestColumn(bars: readonly BarFact[]): number {
   const width = bars[0]?.h.length ?? 0;
   let tallest = 0;

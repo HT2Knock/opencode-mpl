@@ -1,9 +1,7 @@
-/** OpenCode theme palette to an mpl style. All colors are opaque and theme-derived. */
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 
-/** The palette the TUI part writes for the server renderer. */
 export interface Palette {
   readonly mode: "dark" | "light";
   readonly background: string;
@@ -13,8 +11,6 @@ export interface Palette {
   readonly categorical: readonly string[];
 }
 
-
-/** Hue step used for series colors: bright on dark backgrounds, deeper on light ones. */
 export function seriesStep(mode: Palette["mode"]): number {
   return mode === "dark" ? 400 : 600;
 }
@@ -40,10 +36,6 @@ export function isPalette(value: unknown): value is Palette {
   );
 }
 
-/**
- * Builds .mplstyle text from a palette. The layout keys match the bundled pro styles,
- * so a themed chart keeps matplotlib's look and only the colors change.
- */
 export function styleFromPalette(palette: Palette): string {
   const background = bareHex(palette.background, "background");
   const text = bareHex(palette.text, "text");
@@ -92,7 +84,6 @@ export function styleFromPalette(palette: Palette): string {
   ].join("\n");
 }
 
-/** Shared palette file: the TUI part writes it, the server renderer reads it. */
 export function palettePath(env: NodeJS.ProcessEnv = process.env): string {
   const dataHome = env.XDG_DATA_HOME || join(homedir(), ".local", "share");
   return join(dataHome, "opencode", "mpl", "palette.json");
@@ -107,7 +98,6 @@ export function readPalette(env: NodeJS.ProcessEnv = process.env): Palette | und
   }
 }
 
-/** Writes through a temporary file, so a reader never sees a half-written palette. */
 export function writePalette(palette: Palette, env: NodeJS.ProcessEnv = process.env): string {
   const path = palettePath(env);
   mkdirSync(dirname(path), { recursive: true });
@@ -117,16 +107,11 @@ export function writePalette(palette: Palette, env: NodeJS.ProcessEnv = process.
   return path;
 }
 
-/** CLI settings path: the theme selection lives here, not in opencode.json. */
 export function cliSettingsPath(env: NodeJS.ProcessEnv = process.env): string {
   const configHome = env.XDG_CONFIG_HOME || join(homedir(), ".config");
   return join(configHome, "opencode", "cli.json");
 }
 
-/**
- * Bundled style used when no TUI palette reached the server, such as a headless run.
- * `theme.mode` is a TUI setting; "system" cannot be resolved here, so it counts as dark.
- */
 export function fallbackStyle(env: NodeJS.ProcessEnv = process.env): string {
   try {
     const raw = readFileSync(cliSettingsPath(env), "utf8");

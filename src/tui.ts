@@ -1,4 +1,3 @@
-/** TUI part: writes the active OpenCode theme for the server renderer, once per TUI load. */
 import { Plugin } from "@opencode/plugin/tui";
 import { seriesStep, writePalette } from "./palette.js";
 

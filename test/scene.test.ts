@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { covers, factsFromSpec, isStacked, tallestColumn } from "../eval/scene";
+import { buildFigure } from "../src/replay";
 import type { MplRenderInput } from "../src/render";
 
 const stacked: MplRenderInput = {
@@ -21,11 +22,35 @@ test("the facts report stacked bars, labels, and the legend", () => {
   expect(facts.theme).toBe("pro-dark");
 });
 
-test("a positional width is rejected before the keyword object can be dropped", () => {
-  const broken: MplRenderInput = {
-    calls: [["bar", [["a", "b"], [300, 500], 0.72], { bottom: [0, 0], label: "one" }]],
+test("a positional width and bottom reach the bars", () => {
+  const positional: MplRenderInput = {
+    calls: [
+      ["bar", [["a", "b"], [300, 500], 0.72, [0, 0]], { label: "one" }],
+      ["bar", [["a", "b"], [200, 400], 0.72, [300, 500]], { label: "two" }],
+      ["legend", [], {}],
+    ],
   };
-  expect(() => factsFromSpec(broken, "pro-dark")).toThrow(/bar takes 2 positional arguments/);
+  const facts = factsFromSpec(positional, "pro-dark");
+  expect(isStacked(facts.bars)).toBe(true);
+  expect(tallestColumn(facts.bars)).toBe(900);
+  expect(facts.labeled).toBe(2);
+  expect(facts.bars.every((bar) => bar.w.every((width) => width === 0.72))).toBe(true);
+});
+
+test("barh binds a positional height and left", () => {
+  const fig = buildFigure({
+    style: [],
+    calls: [["barh", [["a", "b"], [300, 500], 0.72, [10, 20]], { label: "one" }]],
+  });
+  const artist = (
+    fig.axes[0] as unknown as {
+      artists: readonly { kind: string; x: Float64Array; w: Float64Array; h: Float64Array }[];
+    }
+  ).artists[0]!;
+  expect(artist.kind).toBe("bar");
+  expect([...artist.x]).toEqual([10, 20]);
+  expect([...artist.w]).toEqual([300, 500]);
+  expect([...artist.h]).toEqual([0.72, 0.72]);
 });
 
 test("grouped bars are not stacked", () => {

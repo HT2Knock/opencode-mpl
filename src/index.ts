@@ -1,4 +1,3 @@
-/** OpenCode Plugin part: registers the mpl tool and the mpl-charts skill. */
 import { homedir } from "node:os";
 import { isAbsolute, join } from "node:path";
 import { Plugin, Skill, Tool } from "@opencode/plugin/effect";
@@ -52,10 +51,6 @@ function attempt<T>(run: () => T): Attempt<T> {
   }
 }
 
-/**
- * The render directory: the plugin option `outputDir` (relative paths resolve against the
- * session location), else the dated directory under the OpenCode data dir.
- */
 function chartDir(options: unknown, directory: string): string {
   const value = (options as Record<string, unknown> | undefined)?.outputDir;
   if (typeof value === "string" && value.length > 0) return isAbsolute(value) ? value : join(directory, value);

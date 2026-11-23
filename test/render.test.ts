@@ -111,9 +111,17 @@ test("a bad argument reports the call index", () => {
   expect(() => renderChart({ calls: [["sca", [9]]] }, { outDir })).toThrow(/calls\[0\] sca: no Axes 9/);
 });
 
-test("a positional width is rejected with the fix in the message", () => {
-  expect(() => renderChart({ calls: [["bar", [["a", "b"], [3, 7], 0.72]]] }, { outDir })).toThrow(
-    /calls\[0\] bar: bar takes 2 positional arguments, got 3\. Put width, bottom, left, color, and label in the kwargs object/,
+test("a positional width renders", () => {
+  const out = renderChart({ calls: [["bar", [["a", "b"], [3, 7], 0.72]]] }, { outDir });
+  expect([...(out.png ?? []).slice(0, 4)]).toEqual(PNG_MAGIC);
+});
+
+test("arguments mpl does not take are reported with the call index", () => {
+  expect(() => renderChart({ calls: [["bar", [["a", "b"], [3, 7], 0.72, [0, 0], 5]]] }, { outDir })).toThrow(
+    /calls\[0\] bar: bar\(\) takes at most 2 optional positional arguments \(width, bottom\) and one keyword object/,
+  );
+  expect(() => renderChart({ calls: [["legend", [["a"]]]] }, { outDir })).toThrow(
+    /calls\[0\] legend: legend\(\) keyword arguments must be a plain object/,
   );
 });
 
