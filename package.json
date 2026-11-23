@@ -1,9 +1,16 @@
 {
   "name": "opencode-mpl",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.2",
   "description": "OpenCode plugin: matplotlib-style charts from the mpl renderer (pure JavaScript, pixel-exact)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HT2Knock/opencode-mpl.git"
+  },
+  "homepage": "https://github.com/HT2Knock/opencode-mpl#readme",
+  "bugs": {
+    "url": "https://github.com/HT2Knock/opencode-mpl/issues"
+  },
   "type": "module",
   "exports": {
     ".": "./dist/index.js",

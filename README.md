@@ -11,17 +11,14 @@ to the OpenCode 2 plugin API. It runs no Python and no browser.
 
 ## Install
 
-Use a local checkout:
+```sh
+opencode plugin add opencode-mpl@0.2.2
+```
+
+For a local checkout, add its directory to `plugins`:
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 { "plugins": ["/Users/you/personal/opencode-mpl"] }
-```
-
-Or install the tagged build from GitHub. `dist/` is committed, so the install
-runs no build step:
-
-```sh
-opencode plugin add github:HT2Knock/opencode-mpl#v0.2.1
 ```
 
 The plugin requires OpenCode 2.3.2 or newer, and older than 2.4.0.
