@@ -4,6 +4,7 @@ import { homedir, tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { factsFromSpec } from "./scene";
 import { tasks, type Task } from "./tasks";
+import { transcriptFacts } from "./transcript";
 
 const PLUGIN = resolve(import.meta.dir, "..");
 const RUN_ROOT = join(tmpdir(), "opencode-mpl-eval");
@@ -19,6 +20,7 @@ interface Row {
   readonly ok: boolean;
   readonly reasons: readonly string[];
   readonly renders: number;
+  readonly attempts: number;
   readonly errors: number;
   readonly theme: string;
   readonly seconds: number;
@@ -42,11 +44,6 @@ function chartFiles(): string[] {
   } catch {
     return [];
   }
-}
-
-function countErrors(transcript: string): number {
-  const matches = transcript.match(/unknown call "|unexpected keyword argument|SyntaxError|TypeError|RangeError/g);
-  return matches?.length ?? 0;
 }
 
 async function runOne(task: Task, model: string): Promise<Row> {
@@ -75,7 +72,7 @@ async function runOne(task: Task, model: string): Promise<Row> {
   const newSidecars = chartFiles()
     .filter((path) => path.endsWith(".json") && !before.has(path))
     .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
-  const errors = countErrors(transcript);
+  const { attempts, errors } = transcriptFacts(transcript);
   const seconds = Math.round((Date.now() - started) / 1000);
 
   if (newSidecars.length === 0) {
@@ -85,6 +82,7 @@ async function runOne(task: Task, model: string): Promise<Row> {
       ok: false,
       reasons: ["no chart was rendered"],
       renders: 0,
+      attempts,
       errors,
       theme: "",
       seconds,
@@ -116,6 +114,7 @@ async function runOne(task: Task, model: string): Promise<Row> {
     ok: reasons.length === 0,
     reasons,
     renders: newSidecars.length,
+    attempts,
     errors,
     theme: sidecar.resolvedTheme,
     seconds,
@@ -132,7 +131,11 @@ for (const model of models) {
     process.stdout.write(`${task.id} with ${model} ... `);
     const row = await runOne(task, model);
     rows.push(row);
-    console.log(row.ok ? `pass (${row.renders} renders, ${row.errors} errors, ${row.seconds}s)` : `FAIL: ${row.reasons.join("; ")}`);
+    console.log(
+      row.ok
+        ? `pass (${row.renders} renders, ${row.attempts} attempts, ${row.errors} errors, ${row.seconds}s)`
+        : `FAIL: ${row.reasons.join("; ")}`,
+    );
   }
 }
 
@@ -143,7 +146,7 @@ writeFileSync(join(RESULTS, `run-${stamp}.json`), JSON.stringify(rows, null, 2))
 console.log("");
 for (const row of rows) {
   console.log(
-    `${row.ok ? "pass" : "FAIL"}  ${row.task.padEnd(18)} ${row.model.padEnd(38)} renders=${row.renders} errors=${row.errors} theme=${row.theme || "-"} ${row.seconds}s`,
+    `${row.ok ? "pass" : "FAIL"}  ${row.task.padEnd(18)} ${row.model.padEnd(38)} renders=${row.renders} attempts=${row.attempts} errors=${row.errors} theme=${row.theme || "-"} ${row.seconds}s`,
   );
 }
 const passed = rows.filter((row) => row.ok).length;

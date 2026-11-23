@@ -37,17 +37,20 @@ bun eval/compare.ts eval/baseline.json eval/after.json
 A render that produces a file but draws the wrong figure fails, because the
 checks read the figure.
 
-The runner records four numbers per task:
+The runner records five numbers per task:
 
-| Number  | Meaning                       |
-| ------- | ----------------------------- |
-| renders | Charts the run wrote          |
-| errors  | Loud errors in the transcript |
-| theme   | Theme reported by the sidecar |
-| seconds | Wall time                     |
+| Number   | Meaning                       |
+| -------- | ----------------------------- |
+| renders  | Charts the run wrote          |
+| attempts | `mpl.render` calls            |
+| errors   | Failed `mpl.render` calls     |
+| theme    | Theme reported by the sidecar |
+| seconds  | Wall time                     |
 
-Renders above one mean the agent iterated. Errors mean the tool rejected a call.
-Neither fails a task by itself.
+Renders above one mean the agent wrote more than one chart. Attempts above one
+mean it tried more than once. Errors mean the tool rejected a call. Neither
+fails a task by itself. The runner reads attempts and errors from the
+structured tool calls, not from the transcript text.
 
 ## Tasks
 

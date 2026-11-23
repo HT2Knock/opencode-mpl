@@ -64,6 +64,35 @@ guard. The skill teaches the matplotlib form.
 The table above records runs with the guard. Do not compare a new run against
 it without noting the difference.
 
+## Rerun after the upstream fix
+
+The rerun used `f1d9d97` and the same six tasks with two models. All 12 runs
+passed. The run wrote 13 charts from 13 render calls and had no failed calls.
+
+| Task             | DeepSeek      | Sonnet   |
+| ---------------- | ------------- | -------- |
+| stacked-bars     | pass, 1 chart | pass, 1  |
+| grouped-bars     | pass, 1 chart | pass, 1  |
+| date-series      | pass, 1 chart | pass, 1  |
+| heatmap-colorbar | pass, 2 charts | pass, 1 |
+| two-panels       | pass, 1 chart | pass, 1  |
+| recovery         | pass, 1 chart | pass, 1  |
+
+The grouped bar loop is gone. Sonnet went from 40 render calls and 189 seconds
+to 1 call and 6 seconds. DeepSeek went from 7 charts to 1. Its first call now
+uses `bar(x, height, width, bottom)`, and the legend labels reach the bars.
+
+One earlier rerun on the same build had 4 failed calls in 17 attempts, all
+recovered on the next call. The failures were `set_axisbelow` and `subplots` as
+Axes methods, and one `bar` call with no height. That run passed 12 of 12, but
+the old metric reported 0 errors. The transcript stores the error as
+`unknown call \"set_axisbelow\"`, so a text search for `unknown call "` misses
+it. The runner now reads attempts and failures from the structured tool calls.
+The new parser has a test.
+
+The sample is still one run per task. The 40 to 1 drop is large and the session
+record shows the cause. The 1 to 2 chart changes are noise.
+
 ## Next
 
 - Add the pim chart as a task: eight series, thirteen months, two panels.

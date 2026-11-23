@@ -6,6 +6,7 @@ interface Row {
   readonly model: string;
   readonly ok: boolean;
   readonly renders: number;
+  readonly attempts?: number;
   readonly errors: number;
   readonly seconds: number;
 }
@@ -31,7 +32,9 @@ for (const key of keys) {
   const b = right.get(key);
   const [task, model] = key.split("|");
   const format = (row: Row | undefined) =>
-    row ? `${row.ok ? "pass" : "FAIL"} r=${row.renders} e=${row.errors} ${row.seconds}s` : "-";
+    row
+      ? `${row.ok ? "pass" : "FAIL"} r=${row.renders} a=${row.attempts ?? "-"} e=${row.errors} ${row.seconds}s`
+      : "-";
   console.log(`${task!.padEnd(18)} ${model!.padEnd(26)} ${format(a).padEnd(17)} ${format(b)}`);
 }
 
@@ -39,7 +42,9 @@ const summarize = (rows: Map<string, Row>) => {
   const all = [...rows.values()];
   const passes = all.filter((row) => row.ok).length;
   const renders = all.reduce((sum, row) => sum + row.renders, 0);
-  return `${passes}/${all.length} pass, ${renders} renders`;
+  const attempts = all.reduce((sum, row) => sum + (row.attempts ?? 0), 0);
+  const hasAttempts = all.some((row) => row.attempts !== undefined);
+  return `${passes}/${all.length} pass, ${renders} renders${hasAttempts ? `, ${attempts} attempts` : ""}`;
 };
 
 console.log(`\nbefore: ${summarize(left)}\nafter:  ${summarize(right)}`);
