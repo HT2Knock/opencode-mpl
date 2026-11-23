@@ -14,16 +14,18 @@ to the OpenCode 2 plugin API. It runs no Python and no browser.
 ## Install
 
 ```sh
-opencode plugin add opencode-mpl@0.2.2
+opencode plugin add opencode-mpl
 ```
 
-For a local checkout, add its directory to `plugins`:
+OpenCode installs the latest release and writes the entry to
+`~/.config/opencode/opencode.jsonc`. The plugin supports OpenCode 2.3.2 through
+2.3.x. To update it later, run `opencode plugin update opencode-mpl`.
 
-```jsonc title="~/.config/opencode/opencode.jsonc"
+To load a local checkout, add its directory to `plugins` in the same file:
+
+```jsonc
 { "plugins": ["/Users/you/personal/opencode-mpl"] }
 ```
-
-The plugin requires OpenCode 2.3.2 or newer, and older than 2.4.0.
 
 ## Draw a chart
 
@@ -78,16 +80,7 @@ bun run build
 `bun run eval` runs the agent eval: six chart tasks against two models, scored
 from the figure each run drew.
 
-Commit `dist/` with every source change. The npm package ships `dist/`, so run
-`bun run build` before publishing.
-
-## Release
-
-Bump `version` in `package.json`, commit, and tag the release. Then publish:
-
-```sh
-npm publish --access public
-```
+Commit `dist/` with every source change, because the npm package ships it.
 
 ## License
 
