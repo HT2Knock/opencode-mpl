@@ -1,5 +1,7 @@
 # opencode-mpl
 
+[![npm](https://img.shields.io/npm/v/opencode-mpl)](https://www.npmjs.com/package/opencode-mpl)
+
 Charts inside OpenCode, drawn by [mpl](https://github.com/ivarvong/mpl), a pure
 JavaScript reimplementation of matplotlib 3.11. The model writes a figure spec,
 the plugin replays the matplotlib calls, and you get a PNG or an SVG file plus
@@ -76,8 +78,16 @@ bun run build
 `bun run eval` runs the agent eval: six chart tasks against two models, scored
 from the figure each run drew.
 
-Commit `dist/` with every source change. OpenCode loads the plugin from Git
-without a build step.
+Commit `dist/` with every source change. The npm package ships `dist/`, so run
+`bun run build` before publishing.
+
+## Release
+
+Bump `version` in `package.json`, commit, and tag the release. Then publish:
+
+```sh
+npm publish --access public
+```
 
 ## License
 
